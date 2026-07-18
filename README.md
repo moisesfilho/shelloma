@@ -1,80 +1,82 @@
 # 🐚 Shelloma
 
-> **Tradutor de Linguagem Natural para Comandos Shell do Linux (Debian/Ubuntu) alimentado por Ollama local.**
+> **Natural Language to Shell Translator for Linux (Debian/Ubuntu) powered by local Ollama.**
 
 [![Go Version](https://img.shields.io/badge/Go-1.20%2B-00ADD8?style=flat&logo=go)](https://golang.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Platform](https://img.shields.io/badge/Platform-Linux%20(Debian%2FUbuntu)-E6007E?logo=debian)](https://www.debian.org)
 [![Ollama](https://img.shields.io/badge/LLM-Ollama-black?logo=ollama)](https://ollama.com)
 
-O **Shelloma** é uma aplicação CLI nativa e ultrarrápida desenvolvida em Go que traduz suas instruções em linguagem natural diretamente para comandos de terminal (Bash/Zsh) executáveis no Linux, utilizando o seu próprio modelo local via **Ollama**.
+**[English](README.md) | [Português](README_pt.md) | [Español](README_es.md)**
+
+**Shelloma** is a native, ultra-fast Linux CLI application written in Go that translates natural language instructions directly into executable terminal commands (Bash/Zsh) using your local LLM models via **Ollama**.
 
 ---
 
-## 🛠️ Como Funciona?
+## 🛠️ How It Works
 
-1. **Interpretação**: O Shelloma captura sua instrução em português (ou outro idioma configurado), detecta automaticamente as especificidades do seu sistema operacional Linux (distribuição, versão, usuário atual, diretório de trabalho) e envia o contexto para a API do Ollama local.
-2. **Geração de Comando**: O modelo gera estritamente o comando Bash/Zsh correspondente.
-3. **Menu Interativo**: O Shelloma exibe o comando formatado em um card visual e permite que você escolha se deseja **Executar**, **Pedir Explicação do Comando**, **Modificar**, **Copiar para Clipboard** ou **Sair**.
-4. **Análise de Execução e Recuperação de Erros**: Após a execução, o Shelloma analisa o retorno do terminal. Se houver falha, ele identifica a causa e **sugere automaticamente um comando de correção**, retornando ao comando anterior de forma encadeada assim que o erro for corrigido.
-
----
-
-## ✨ Recursos
-
-- 🚀 **Nativo e Leve**: Executável único compilado em Go, sem necessidade de Python, Node.js ou runtime externo.
-- 🔒 **100% Privado e Offline**: Nenhum dado ou comando sai da sua máquina.
-- 🌐 **Internacionalização Nativa (i18n)**: Suporte completo para **Português Brasileiro (`pt`)**, **Inglês (`en`)** e **Espanhol (`es`)** através de arquivos JSON embarcados.
-- 🤖 **Seleção Automática de Modelo**: Detecta os modelos instalados no Ollama e seleciona automaticamente o melhor modelo focado em código/shell disponível.
-- 💡 **Detecção e Inicialização do Ollama**: Se o serviço Ollama estiver parado, o Shelloma avisa e oferece um comando rápido interativo para iniciá-lo (`sudo systemctl start ollama`) com retry loop automático.
-- 📦 **Instalação Simplificada `.deb`**: Pacote Debian pronto com assistente interativo de configuração de idioma na instalação.
+1. **Interpretation**: Shelloma captures your natural language instruction, automatically detects your Linux system context (distribution, version, current user, working directory), and sends the context to your local Ollama API.
+2. **Command Generation**: The model generates strictly the corresponding executable Bash/Zsh command.
+3. **Interactive Menu**: Shelloma presents the generated command in a formatted visual card and lets you choose whether to **Execute**, **Request Command Explanation**, **Modify**, **Copy to Clipboard**, or **Quit**.
+4. **Execution Analysis & Error Recovery**: After execution, Shelloma analyzes the terminal output. If the command fails, it identifies the root cause and **automatically suggests a fix command**, recursively returning to the previous command once the issue is resolved.
 
 ---
 
-## ⚙️ Dependências
+## ✨ Features
 
-1. **Sistema Operacional**: Linux (Debian, Ubuntu ou distribuições derivadas).
-2. **Ollama**: Serviço do Ollama instalado e ativo localmente.
-3. **Go 1.20+** *(opcional)*: Apenas caso deseje compilar a aplicação a partir do código-fonte.
+- 🚀 **Native & Lightweight**: Single self-contained binary compiled in Go—no Python, Node.js, or external runtime required.
+- 🔒 **100% Private & Offline**: All data and commands stay on your local machine.
+- 🌐 **Native Internationalization (i18n)**: Full support for **English (`en`)**, **Brazilian Portuguese (`pt`)**, and **Spanish (`es`)** via embedded JSON files (`embed.FS`).
+- 🤖 **Automatic Model Selection**: Automatically detects installed Ollama models and selects the best available coding/shell model.
+- 💡 **Ollama Offline Recovery**: Detects when Ollama is offline and interactively offers to start the service (`sudo systemctl start ollama`) with an automatic retry loop.
+- 📦 **Simplified `.deb` Installation**: Pre-packaged Debian installer with an interactive language setup wizard during `sudo dpkg -i`.
 
 ---
 
-## 🦙 Como Instalar e Configurar o Ollama
+## ⚙️ Dependencies
 
-O **[Ollama](https://ollama.com)** é a ferramenta aberta responsável por rodar modelos de inteligência artificial localmente no seu computador.
+1. **Operating System**: Linux (Debian, Ubuntu, or derivative distributions).
+2. **Ollama**: Ollama service installed and running locally.
+3. **Go 1.20+** *(optional)*: Only required if compiling from source code.
 
-- **Website Oficial**: [https://ollama.com](https://ollama.com)
-- **Repositório GitHub**: [https://github.com/ollama/ollama](https://github.com/ollama/ollama)
+---
 
-### Passo 1: Instalar o Ollama no Linux
+## 🦙 How to Install and Configure Ollama
 
-No seu terminal Linux, execute o comando oficial de instalação:
+**[Ollama](https://ollama.com)** is the open-source engine used to run AI models locally on your machine.
+
+- **Official Website**: [https://ollama.com](https://ollama.com)
+- **GitHub Repository**: [https://github.com/ollama/ollama](https://github.com/ollama/ollama)
+
+### Step 1: Install Ollama on Linux
+
+Run the official installation script in your Linux terminal:
 
 ```bash
 curl -fsSL https://ollama.com/install.sh | sh
 ```
 
-### Passo Passo 2: Verificar a Execução do Serviço
+### Step 2: Verify Service Status
 
-Geralmente o Ollama inicia automaticamente como serviço do sistema. Você pode verificar o status com:
+Ollama usually starts automatically as a system daemon. You can verify its status with:
 
 ```bash
 sudo systemctl status ollama
 ```
 
-*Se o serviço não estiver rodando, você pode iniciá-lo com `sudo systemctl start ollama` ou executar manualmente `ollama serve`.*
+*If the service is not running, start it with `sudo systemctl start ollama` or run `ollama serve` manually.*
 
 ---
 
-## 🎯 Modelos Recomendados para Shell e Código
+## 🎯 Recommended Models for Shell & Coding
 
-Para obter as melhores respostas de comandos de terminal Linux, recomendamos utilizar modelos treinados para código. Execute o comando `ollama pull <modelo>` para baixar o modelo desejado:
+For optimal terminal command generation, we recommend code-focused models. Run `ollama pull <model>` to download a model:
 
-1. **Qwen 2.5 Coder 1.5B** *(Altamente Recomendado - Leve e Ultrarrápido)*:
+1. **Qwen 2.5 Coder 1.5B** *(Highly Recommended - Lightweight & Fast)*:
    ```bash
    ollama pull qwen2.5-coder:1.5b
    ```
-2. **Qwen 2.5 Coder 7B** *(Excelente precisão para tarefas complexas)*:
+2. **Qwen 2.5 Coder 7B** *(High accuracy for complex tasks)*:
    ```bash
    ollama pull qwen2.5-coder:7b
    ```
@@ -89,96 +91,96 @@ Para obter as melhores respostas de comandos de terminal Linux, recomendamos uti
 
 ---
 
-## 📦 Guia de Instalação Simplificado do Shelloma
+## 📦 Simplified Shelloma Installation Guide
 
-### Opção 1: Via Pacote Debian (`.deb`) - Recomendado
+### Option 1: Debian Package (`.deb`) - Recommended
 
-Baixe o arquivo `.deb` gerado no repositório e instale com o comando:
+Download the latest `.deb` package and install it using:
 
 ```bash
 sudo dpkg -i shelloma_1.0.0_amd64.deb
 ```
 
-*Durante a instalação, será exibido um menu no terminal para escolher o idioma padrão da aplicação (Inglês, Português ou Espanhol).*
+*During installation, an interactive prompt will ask you to select the default application language (English, Portuguese, or Spanish).*
 
-### Opção 2: Compilando a partir do Código-Fonte
+### Option 2: Build from Source
 
 ```bash
-# 1. Clonar o repositório
+# 1. Clone repository
 git clone https://github.com/moisesfilho/shelloma.git
 cd shelloma
 
-# 2. Compilar e instalar no diretório do usuário (~/.local/bin)
+# 2. Build and install to user binary directory (~/.local/bin)
 make build
 make install-user
 ```
 
 ---
 
-## 🚀 Guia de Uso Simplificado
+## 🚀 Simplified Usage Guide
 
-### Uso Básico
+### Basic Usage
 
-Basta chamar o `shelloma` seguido da sua instrução entre aspas:
+Run `shelloma` followed by your instruction in quotes:
 
 ```bash
-# Exemplos em Português
-shelloma "listar todos os arquivos pdf da pasta downloads"
-shelloma "verificar espaço em disco e uso de memória"
-shelloma "criar uma pasta chamada fotos e mover todas as imagens png para ela"
+# English examples
+shelloma "list all pdf files in downloads folder"
+shelloma "check disk space and memory usage"
+shelloma "create a folder named images and move all png files into it"
 
-# Exemplos em outros idiomas
-shelloma -l en "list all active docker containers"
+# Multi-language flags
+shelloma -l pt "listar todos os arquivos da pasta atual"
 shelloma -l es "mostrar procesos que consumen mas cpu"
 ```
 
-### Menu de Opções da CLI
+### Interactive CLI Menu
 
-Ao gerar o comando, o Shelloma exibirá o card e aguardará sua ação:
+When a command is generated, Shelloma displays the card and waits for your choice:
 
 ```text
 ┌────────────────────────────────────────────┐
 │  ls -la ~/Downloads/*.pdf                 │
 └────────────────────────────────────────────┘
 
-Opções: [Enter/y: Executar] [e: Explicar] [m: Modificar] [c: Copiar] [q/n: Sair]:
+Options: [Enter/y: Execute] [e: Explain] [m: Modify] [c: Copy] [q/n: Quit]:
 ```
 
-- **Pressionar `Enter` ou `y`**: Executa o comando diretamente no terminal.
-- **Digite `e`**: Solicita uma explicação linha por linha do comando ao Ollama.
-- **Digite `m`**: Abre um prompt para você editar o comando antes de executar.
-- **Digite `c`**: Copia o comando diretamente para a área de transferência do sistema.
-- **Digite `q` ou `n`**: Cancela a operação de forma segura.
+- **Press `Enter` or `y`**: Executes the command directly in terminal.
+- **Type `e`**: Requests a line-by-line explanation from Ollama.
+- **Type `m`**: Opens a prompt to edit the command before execution.
+- **Type `c`**: Copies the command directly to your system clipboard.
+- **Type `q` or `n`**: Cancels the operation safely.
 
-### Comandos de Configuração e Utilitários
+### Configuration & Utilities
 
 ```bash
-# Exibir as configurações atuais do Shelloma
+# Display current configuration
 shelloma config
 
-# Alterar o idioma padrão salvo (pt, en, es)
-shelloma config set lang pt
+# Change default saved language (en, pt, es)
+shelloma config set lang en
 
-# Definir um modelo específico do Ollama
+# Set a specific Ollama model
 shelloma config set model qwen2.5-coder:1.5b
 
-# Listar os modelos do Ollama instalados na sua máquina
+# List installed Ollama models
 shelloma models
 ```
 
-### Flags Disponíveis
+### Command Flags
 
 ```text
-Opções:
-  -l, --lang string    Idioma: en, pt, es (padrão: en)
-  -m, --model string   Modelo Ollama a utilizar (ex: qwen2.5-coder:1.5b)
-  -url string          URL da API do Ollama (padrão: http://localhost:11434)
-  -y, --yes            Executar o comando gerado automaticamente sem confirmação
-  -v, --version        Exibir versão do Shelloma
+Options:
+  -l, --lang string    Language: en, pt, es (default: en)
+  -m, --model string   Ollama model to use (e.g. qwen2.5-coder:1.5b)
+  -url string          Ollama API URL (default: http://localhost:11434)
+  -y, --yes            Execute generated command automatically without confirmation
+  -v, --version        Display Shelloma version
 ```
 
 ---
 
-## 📄 Licença
+## 📄 License
 
-Este projeto está licenciado sob a licença **MIT** - consulte o arquivo [LICENSE](LICENSE) para obter mais detalhes.
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
