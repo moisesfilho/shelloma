@@ -1,0 +1,19 @@
+# Binários e pacotes gerados
+shelloma
+shelloma_*
+*.deb
+
+# Diretórios de build
+build/
+bin/
+dist/
+
+# Arquivos de IDE e editores
+.vscode/
+.idea/
+*.swp
+*~
+
+# Temporários
+*.tmp
+*.log
