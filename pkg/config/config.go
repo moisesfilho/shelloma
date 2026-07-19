@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"runtime"
 )
 
 type Config struct {
@@ -25,34 +26,40 @@ func DefaultConfig() Config {
 }
 
 func GetConfigPath() (string, error) {
-	home, err := os.UserHomeDir()
+	dir, err := os.UserConfigDir()
 	if err != nil {
-		return "", err
+		home, hErr := os.UserHomeDir()
+		if hErr != nil {
+			return "", err
+		}
+		return filepath.Join(home, ".config", "shelloma", "config.json"), nil
 	}
-	return filepath.Join(home, ".config", "shelloma", "config.json"), nil
+	return filepath.Join(dir, "shelloma", "config.json"), nil
 }
 
 func LoadConfig() (Config, error) {
 	cfg := DefaultConfig()
 
-	// 1. Ler a configuração do sistema em /etc/shelloma/config.json (caso exista, gravada pelo .deb postinst)
-	systemPath := "/etc/shelloma/config.json"
-	if data, err := os.ReadFile(systemPath); err == nil {
-		var sysCfg Config
-		if err := json.Unmarshal(data, &sysCfg); err == nil {
-			if sysCfg.OllamaURL != "" {
-				cfg.OllamaURL = sysCfg.OllamaURL
+	// 1. Ler a configuração do sistema em /etc/shelloma/config.json (se existir no Linux/macOS)
+	if runtime.GOOS != "windows" {
+		systemPath := "/etc/shelloma/config.json"
+		if data, err := os.ReadFile(systemPath); err == nil {
+			var sysCfg Config
+			if err := json.Unmarshal(data, &sysCfg); err == nil {
+				if sysCfg.OllamaURL != "" {
+					cfg.OllamaURL = sysCfg.OllamaURL
+				}
+				if sysCfg.Model != "" {
+					cfg.Model = sysCfg.Model
+				}
+				if sysCfg.Language != "" {
+					cfg.Language = sysCfg.Language
+				}
+				if sysCfg.Temperature > 0 {
+					cfg.Temperature = sysCfg.Temperature
+				}
+				cfg.AutoExecute = sysCfg.AutoExecute
 			}
-			if sysCfg.Model != "" {
-				cfg.Model = sysCfg.Model
-			}
-			if sysCfg.Language != "" {
-				cfg.Language = sysCfg.Language
-			}
-			if sysCfg.Temperature > 0 {
-				cfg.Temperature = sysCfg.Temperature
-			}
-			cfg.AutoExecute = sysCfg.AutoExecute
 		}
 	}
 

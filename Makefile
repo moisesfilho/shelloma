@@ -1,4 +1,4 @@
-.PHONY: all build build-all deb tar appimage flatpak install-user test clean help release-snapshot
+.PHONY: all build build-all build-linux build-darwin build-windows deb tar appimage flatpak install-user test clean help release-snapshot
 
 BINARY_NAME=shelloma
 VERSION=1.0.2
@@ -10,12 +10,28 @@ build:
 	go build -ldflags="-s -w" -o $(BINARY_NAME) .
 	@echo "✔ Binário gerado em ./$(BINARY_NAME)"
 
-build-all:
-	@echo "🔨 Compilando binários nativos para amd64 e arm64..."
+build-all: build-linux build-darwin build-windows
+
+build-linux:
+	@echo "🔨 Compilando binários nativos Linux (amd64 e arm64)..."
 	@mkdir -p dist
 	GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o dist/$(BINARY_NAME)_linux_amd64 .
 	GOOS=linux GOARCH=arm64 go build -ldflags="-s -w" -o dist/$(BINARY_NAME)_linux_arm64 .
-	@echo "✔ Binários gerados em ./dist/"
+	@echo "✔ Binários Linux gerados em ./dist/"
+
+build-darwin:
+	@echo "🔨 Compilando binários nativos macOS (amd64 e arm64)..."
+	@mkdir -p dist
+	GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -o dist/$(BINARY_NAME)_darwin_amd64 .
+	GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" -o dist/$(BINARY_NAME)_darwin_arm64 .
+	@echo "✔ Binários macOS gerados em ./dist/"
+
+build-windows:
+	@echo "🔨 Compilando binários nativos Windows (amd64 e arm64)..."
+	@mkdir -p dist
+	GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o dist/$(BINARY_NAME)_windows_amd64.exe .
+	GOOS=windows GOARCH=arm64 go build -ldflags="-s -w" -o dist/$(BINARY_NAME)_windows_arm64.exe .
+	@echo "✔ Binários Windows gerados em ./dist/"
 
 test:
 	@echo "🧪 Executando suíte de testes..."
@@ -25,11 +41,13 @@ deb:
 	@./scripts/build-deb.sh
 
 tar: build-all
-	@echo "📦 Gerando tarballs (.tar.gz) para amd64 e arm64..."
+	@echo "📦 Gerando pacotes comprimidos (.tar.gz e .zip)..."
 	@mkdir -p dist
-	tar -czvf dist/$(BINARY_NAME)_$(VERSION)_linux_amd64.tar.gz $(BINARY_NAME) README.md README_pt.md LICENSE scripts/postinstall.sh
-	tar -czvf dist/$(BINARY_NAME)_$(VERSION)_linux_arm64.tar.gz dist/$(BINARY_NAME)_linux_arm64 README.md README_pt.md LICENSE scripts/postinstall.sh
-	@echo "✔ Tarballs gerados em ./dist/"
+	tar -czvf dist/$(BINARY_NAME)_$(VERSION)_linux_amd64.tar.gz -C dist $(BINARY_NAME)_linux_amd64
+	tar -czvf dist/$(BINARY_NAME)_$(VERSION)_linux_arm64.tar.gz -C dist $(BINARY_NAME)_linux_arm64
+	tar -czvf dist/$(BINARY_NAME)_$(VERSION)_darwin_amd64.tar.gz -C dist $(BINARY_NAME)_darwin_amd64
+	tar -czvf dist/$(BINARY_NAME)_$(VERSION)_darwin_arm64.tar.gz -C dist $(BINARY_NAME)_darwin_arm64
+	@echo "✔ Pacotes gerados em ./dist/"
 
 appimage: build
 	@./scripts/build-appimage.sh
@@ -54,10 +72,13 @@ clean:
 help:
 	@echo "Comandos disponíveis:"
 	@echo "  make build            - Compila o binário nativo para a arquitetura local"
-	@echo "  make build-all        - Compila binários nativos para linux/amd64 e linux/arm64 em ./dist/"
+	@echo "  make build-all        - Compila binários para Linux, macOS e Windows (amd64/arm64)"
+	@echo "  make build-linux      - Compila binários para Linux (amd64/arm64)"
+	@echo "  make build-darwin     - Compila binários para macOS (amd64/arm64)"
+	@echo "  make build-windows    - Compila binários para Windows (amd64/arm64)"
 	@echo "  make test             - Executa os testes automatizados do projeto"
 	@echo "  make deb              - Gera o pacote Debian (.deb)"
-	@echo "  make tar              - Gera os pacotes comprimidos (.tar.gz) para amd64 e arm64 em ./dist/"
+	@echo "  make tar              - Gera os pacotes comprimidos em ./dist/"
 	@echo "  make appimage         - Gera o pacote AppImage (.AppImage)"
 	@echo "  make release-snapshot - Simula a release completa localmente usando GoReleaser"
 	@echo "  make install-user     - Instala o executável em ~/.local/bin/shelloma"

@@ -1,22 +1,22 @@
 # 🐚 Shelloma
 
-> **Natural Language to Shell Translator for Linux (Debian/Ubuntu) powered by local Ollama.**
+> **Natural Language to Terminal Command Translator for Linux, macOS & Windows powered by local Ollama.**
 
 [![Go Version](https://img.shields.io/badge/Go-1.20%2B-00ADD8?style=flat&logo=go)](https://golang.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Platform](https://img.shields.io/badge/Platform-Linux%20(Debian%2FUbuntu)-E6007E?logo=debian)](https://www.debian.org)
+[![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS%20%7C%20Windows-blue)](https://github.com/moisesfilho/shelloma)
 [![Ollama](https://img.shields.io/badge/LLM-Ollama-black?logo=ollama)](https://ollama.com)
 
 **[English](README.md) | [Português](README_pt.md) | [Español](README_es.md)**
 
-**Shelloma** is a native, ultra-fast Linux CLI application written in Go that translates natural language instructions directly into executable terminal commands (Bash/Zsh) using your local LLM models via **Ollama**.
+**Shelloma** is a native, ultra-fast CLI application written in Go that translates natural language instructions directly into executable terminal commands (Bash/Zsh on Linux/macOS, PowerShell/CMD on Windows) using your local LLM models via **Ollama**.
 
 ---
 
 ## 🛠️ How It Works
 
-1. **Interpretation**: Shelloma captures your natural language instruction, automatically detects your Linux system context (distribution, version, current user, working directory), and sends the context to your local Ollama API.
-2. **Command Generation**: The model generates strictly the corresponding executable Bash/Zsh command.
+1. **Interpretation**: Shelloma captures your natural language instruction, automatically detects your system context (OS, distribution, shell, current user, working directory), and sends the context to your local Ollama API.
+2. **Command Generation**: The model generates strictly the corresponding executable terminal command (Bash/Zsh for Linux/macOS or PowerShell/CMD for Windows).
 3. **Interactive Menu**: Shelloma presents the generated command in a formatted visual card and lets you choose whether to **Execute**, **Request Command Explanation**, **Modify**, **Copy to Clipboard**, or **Quit**.
 4. **Execution Analysis & Error Recovery**: After execution, Shelloma analyzes the terminal output. If the command fails, it identifies the root cause and **automatically suggests a fix command**, recursively returning to the previous command once the issue is resolved.
 
@@ -24,18 +24,18 @@
 
 ## ✨ Features
 
-- 🚀 **Native & Lightweight**: Single self-contained binary compiled in Go—no Python, Node.js, or external runtime required.
+- 🚀 **Native & Lightweight**: Single self-contained binary compiled in Go for Linux, macOS, and Windows.
 - 🔒 **100% Private & Offline**: All data and commands stay on your local machine.
 - 🌐 **Native Internationalization (i18n)**: Full support for **English (`en`)**, **Brazilian Portuguese (`pt`)**, and **Spanish (`es`)** via embedded JSON files (`embed.FS`).
 - 🤖 **Automatic Model Selection**: Automatically detects installed Ollama models and selects the best available coding/shell model.
-- 💡 **Ollama Offline Recovery**: Detects when Ollama is offline and interactively offers to start the service (`sudo systemctl start ollama`) with an automatic retry loop.
-- 📦 **Simplified `.deb` Installation**: Pre-packaged Debian installer with an interactive language setup wizard during `sudo dpkg -i`.
+- 💡 **Ollama Offline Recovery**: Detects when Ollama is offline and interactively offers to start the service based on your OS (`ollama serve`, `brew services start ollama`, `sudo systemctl start ollama`).
+- 📦 **Cross-Platform Distribution**: Binaries for Windows (`.exe`), macOS, and Linux (`.deb`, `.rpm`, AppImage, Flatpak).
 
 ---
 
 ## ⚙️ Dependencies
 
-1. **Operating System**: Linux (Debian, Ubuntu, or derivative distributions).
+1. **Operating System**: Linux, macOS, or Windows.
 2. **Ollama**: Ollama service installed and running locally.
 3. **Go 1.20+** *(optional)*: Only required if compiling from source code.
 
@@ -48,7 +48,7 @@
 - **Official Website**: [https://ollama.com](https://ollama.com)
 - **GitHub Repository**: [https://github.com/ollama/ollama](https://github.com/ollama/ollama)
 
-### Step 1: Install Ollama on Linux
+### Installation on Linux
 
 Run the official installation script in your Linux terminal:
 
@@ -56,15 +56,26 @@ Run the official installation script in your Linux terminal:
 curl -fsSL https://ollama.com/install.sh | sh
 ```
 
-### Step 2: Verify Service Status
+*Check service status with `sudo systemctl status ollama` or start it with `sudo systemctl start ollama` / `ollama serve`.*
 
-Ollama usually starts automatically as a system daemon. You can verify its status with:
+### Installation on macOS
 
-```bash
-sudo systemctl status ollama
-```
+- **Option 1 (Homebrew)**:
+  ```bash
+  brew install ollama
+  brew services start ollama
+  ```
+- **Option 2 (Official Installer)**: Download the `.zip` from [ollama.com/download/macOS](https://ollama.com/download/Ollama-darwin.zip), unzip, and move it to `/Applications`.
 
-*If the service is not running, start it with `sudo systemctl start ollama` or run `ollama serve` manually.*
+### Installation on Windows
+
+- **Option 1 (Winget)**:
+  ```powershell
+  winget install Ollama.Ollama
+  ```
+- **Option 2 (Official Installer)**: Download `OllamaSetup.exe` from [ollama.com/download/windows](https://ollama.com/download/OllamaSetup.exe) and run the installer.
+
+*After installing on Windows, Ollama will run in the System Tray or can be started from the terminal using `ollama serve`.*
 
 ---
 
@@ -93,12 +104,13 @@ For optimal terminal command generation, we recommend code-focused models. Run `
 
 ## 📦 Installation Guide & Downloads
 
-Pre-compiled binaries and packages for Shelloma are available for download on the official **[GitHub Releases Page](https://github.com/moisesfilho/shelloma/releases)** (`.deb`, `.rpm`, `.tar.gz`, `.snap`, `AppImage`, `.flatpak`).
+Pre-compiled binaries and packages for Shelloma are available for download on the official **[GitHub Releases Page](https://github.com/moisesfilho/shelloma/releases)** (`.deb`, `.rpm`, `.tar.gz`, `.zip`, `AppImage`, `.flatpak`, `.exe`).
 
 ### Option 1: Pre-compiled Packages & Downloads (Recommended)
 
-Visit **[GitHub Releases](https://github.com/moisesfilho/shelloma/releases)** and choose the right format for your Linux distribution:
+Visit **[GitHub Releases](https://github.com/moisesfilho/shelloma/releases)** and choose the right format for your operating system:
 
+#### 🐧 Linux
 - **Debian / Ubuntu / Linux Mint / Pop!_OS (`.deb`)**:
   ```bash
   sudo dpkg -i shelloma_1.0.2_amd64.deb
@@ -123,6 +135,23 @@ Visit **[GitHub Releases](https://github.com/moisesfilho/shelloma/releases)** an
 
 - **Tarball Archive (`.tar.gz`)**:
   Download `.tar.gz` (`amd64` or `arm64`), extract the binary, and place it in your `PATH` (e.g., `~/.local/bin/`).
+
+#### 🍏 macOS
+- **Native Binary (Intel & Apple Silicon M1/M2/M3)**:
+  1. Download `shelloma_1.0.2_darwin_arm64.tar.gz` (Apple Silicon) or `shelloma_1.0.2_darwin_amd64.tar.gz` (Intel) from Releases.
+  2. Extract and make it executable:
+     ```bash
+     tar -xzf shelloma_1.0.2_darwin_arm64.tar.gz
+     chmod +x shelloma
+     sudo mv shelloma /usr/local/bin/
+     ```
+
+#### 🪟 Windows
+- **Native Executable (`.exe` / `.zip`)**:
+  1. Download `shelloma_1.0.2_windows_amd64.zip` (64-bit) or `shelloma_1.0.2_windows_arm64.zip` (ARM64) from Releases.
+  2. Extract the zip archive.
+  3. Move `shelloma.exe` to a folder on your system (e.g., `C:\Program Files\Shelloma` or `C:\Tools\`).
+  4. *(Optional)* Add the directory path to system Environment Variables (`PATH`) to run `shelloma` directly from any PowerShell or Command Prompt (CMD).
 
 ### Option 2: Build from Source
 

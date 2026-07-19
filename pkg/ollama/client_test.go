@@ -147,4 +147,19 @@ func TestOllamaClientMock(t *testing.T) {
 	if cmd != "ls -la" {
 		t.Errorf("Esperava comando 'ls -la', obteve %q", cmd)
 	}
+
+	winSysCtx := sysinfo.SystemContext{
+		OS:         "windows",
+		DistroName: "Windows",
+		Shell:      "powershell.exe",
+		WorkingDir: "C:\\Users\\Test",
+	}
+
+	winCmd, err := client.GenerateCommand(winSysCtx, "listar arquivos", 0.1)
+	if err != nil {
+		t.Fatalf("Erro ao gerar comando no Windows: %v", err)
+	}
+	if winCmd != "ls -la" {
+		t.Errorf("Esperava resposta mockada 'ls -la', obteve %q", winCmd)
+	}
 }

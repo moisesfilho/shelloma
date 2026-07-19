@@ -13,6 +13,8 @@ builds:
       - CGO_ENABLED=0
     goos:
       - linux
+      - darwin
+      - windows
     goarch:
       - amd64
       - arm64
@@ -26,6 +28,9 @@ builds:
 archives:
   - id: default
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        format: zip
     formats:
       - tar.gz
     files:
@@ -48,6 +53,11 @@ nfpms:
     formats:
       - deb
       - rpm
+    depends:
+      - "xclip | wl-clipboard | xsel"
+    recommends:
+      - xclip
+      - wl-clipboard
     bindir: /usr/bin
     section: utils
     priority: optional

@@ -1,22 +1,22 @@
 # 🐚 Shelloma
 
-> **Tradutor de Linguagem Natural para Comandos Shell do Linux (Debian/Ubuntu) alimentado por Ollama local.**
+> **Tradutor de Linguagem Natural para Comandos Terminal (Linux, macOS e Windows) alimentado por Ollama local.**
 
 [![Go Version](https://img.shields.io/badge/Go-1.20%2B-00ADD8?style=flat&logo=go)](https://golang.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Platform](https://img.shields.io/badge/Platform-Linux%20(Debian%2FUbuntu)-E6007E?logo=debian)](https://www.debian.org)
+[![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS%20%7C%20Windows-blue)](https://github.com/moisesfilho/shelloma)
 [![Ollama](https://img.shields.io/badge/LLM-Ollama-black?logo=ollama)](https://ollama.com)
 
 **[English](README.md) | [Português](README_pt.md) | [Español](README_es.md)**
 
-O **Shelloma** é uma aplicação CLI nativa e ultrarrápida desenvolvida em Go que traduz suas instruções em linguagem natural diretamente para comandos de terminal (Bash/Zsh) executáveis no Linux, utilizando o seu próprio modelo local via **Ollama**.
+O **Shelloma** é uma aplicação CLI nativa e ultrarrápida desenvolvida em Go que traduz suas instruções em linguagem natural diretamente para comandos de terminal (Bash/Zsh no Linux/macOS, PowerShell/CMD no Windows) executáveis no seu computador, utilizando o seu próprio modelo local via **Ollama**.
 
 ---
 
 ## 🛠️ Como Funciona?
 
-1. **Interpretação**: O Shelloma captura sua instrução em português (ou outro idioma configurado), detecta automaticamente as especificidades do seu sistema operacional Linux (distribuição, versão, usuário atual, diretório de trabalho) e envia o contexto para a API do Ollama local.
-2. **Geração de Comando**: O modelo gera estritamente o comando Bash/Zsh correspondente.
+1. **Interpretação**: O Shelloma captura sua instrução em português (ou outro idioma configurado), detecta automaticamente as especificidades do seu sistema operacional (Linux, macOS ou Windows, shell em uso, usuário e diretório atual) e envia o contexto para a API do Ollama local.
+2. **Geração de Comando**: O modelo gera estritamente o comando de terminal correspondente (Bash/Zsh para Linux/macOS ou PowerShell/CMD para Windows).
 3. **Menu Interativo**: O Shelloma exibe o comando formatado em um card visual e permite que você escolha se deseja **Executar**, **Pedir Explicação do Comando**, **Modificar**, **Copiar para Clipboard** ou **Sair**.
 4. **Análise de Execução e Recuperação de Erros**: Após a execução, o Shelloma analisa o retorno do terminal. Se houver falha, ele identifica a causa e **sugere automaticamente um comando de correção**, retornando ao comando anterior de forma encadeada assim que o erro for corrigido.
 
@@ -24,18 +24,18 @@ O **Shelloma** é uma aplicação CLI nativa e ultrarrápida desenvolvida em Go 
 
 ## ✨ Recursos
 
-- 🚀 **Nativo e Leve**: Executável único compilado em Go, sem necessidade de Python, Node.js ou runtime externo.
+- 🚀 **Nativo e Leve**: Executável único compilado em Go para Linux, macOS e Windows.
 - 🔒 **100% Privado e Offline**: Nenhum dado ou comando sai da sua máquina.
 - 🌐 **Internacionalização Nativa (i18n)**: Suporte completo para **Português Brasileiro (`pt`)**, **Inglês (`en`)** e **Espanhol (`es`)** através de arquivos JSON embarcados.
 - 🤖 **Seleção Automática de Modelo**: Detecta os modelos instalados no Ollama e seleciona automaticamente o melhor modelo focado em código/shell disponível.
-- 💡 **Detecção e Inicialização do Ollama**: Se o serviço Ollama estiver parado, o Shelloma avisa e oferece um comando rápido interativo para iniciá-lo (`sudo systemctl start ollama`) com retry loop automático.
-- 📦 **Instalação Simplificada `.deb`**: Pacote Debian pronto com assistente interativo de configuração de idioma na instalação.
+- 💡 **Detecção e Inicialização do Ollama**: Se o serviço Ollama estiver parado, o Shelloma avisa e oferece um comando rápido interativo para iniciá-lo de acordo com seu SO (`ollama serve`, `brew services start ollama`, `sudo systemctl start ollama`).
+- 📦 **Instalação Multiplataforma**: Executáveis compilados (`.exe`, binários nativos) e pacotes Linux (`.deb`, `.rpm`, AppImage, Flatpak).
 
 ---
 
 ## ⚙️ Dependências
 
-1. **Sistema Operacional**: Linux (Debian, Ubuntu ou distribuições derivadas).
+1. **Sistema Operacional**: Linux, macOS ou Windows.
 2. **Ollama**: Serviço do Ollama instalado e ativo localmente.
 3. **Go 1.20+** *(opcional)*: Apenas caso deseje compilar a aplicação a partir do código-fonte.
 
@@ -48,23 +48,34 @@ O **[Ollama](https://ollama.com)** é a ferramenta aberta responsável por rodar
 - **Website Oficial**: [https://ollama.com](https://ollama.com)
 - **Repositório GitHub**: [https://github.com/ollama/ollama](https://github.com/ollama/ollama)
 
-### Passo 1: Instalar o Ollama no Linux
+### Instalação no Linux
 
-No seu terminal Linux, execute o comando oficial de instalação:
+No terminal Linux, execute o comando oficial de instalação:
 
 ```bash
 curl -fsSL https://ollama.com/install.sh | sh
 ```
 
-### Passo 2: Verificar a Execução do Serviço
+*Verifique o status do serviço com `sudo systemctl status ollama` ou inicie com `sudo systemctl start ollama` / `ollama serve`.*
 
-Geralmente o Ollama inicia automaticamente como serviço do sistema. Você pode verificar o status com:
+### Instalação no macOS
 
-```bash
-sudo systemctl status ollama
-```
+- **Opção 1 (Homebrew)**:
+  ```bash
+  brew install ollama
+  brew services start ollama
+  ```
+- **Opção 2 (Instalador Oficial)**: Baixe o arquivo `.zip` em [ollama.com/download/macOS](https://ollama.com/download/Ollama-darwin.zip), descompacte e mova para a pasta `/Applications`.
 
-*Se o serviço não estiver rodando, você pode iniciá-lo com `sudo systemctl start ollama` ou executar manualmente `ollama serve`.*
+### Instalação no Windows
+
+- **Opção 1 (Winget)**:
+  ```powershell
+  winget install Ollama.Ollama
+  ```
+- **Opção 2 (Instalador Oficial)**: Baixe o instalador `OllamaSetup.exe` em [ollama.com/download/windows](https://ollama.com/download/OllamaSetup.exe) e siga o assistente.
+
+*Após instalar no Windows, o Ollama ficará ativo na bandeja do sistema (System Tray) ou poderá ser iniciado pelo terminal via `ollama serve`.*
 
 ---
 
@@ -93,12 +104,13 @@ Para obter as melhores respostas de comandos de terminal Linux, recomendamos uti
 
 ## 📦 Guia de Instalação e Downloads
 
-Todos os binários e pacotes pré-compilados do Shelloma estão disponíveis para download na página oficial de **[Releases no GitHub](https://github.com/moisesfilho/shelloma/releases)** (`.deb`, `.rpm`, `.tar.gz`, `.snap`, `AppImage`, `.flatpak`).
+Todos os binários e pacotes pré-compilados do Shelloma estão disponíveis para download na página oficial de **[Releases no GitHub](https://github.com/moisesfilho/shelloma/releases)** (`.deb`, `.rpm`, `.tar.gz`, `.zip`, `AppImage`, `.flatpak`, `.exe`).
 
 ### Opção 1: Download de Binários e Pacotes Pré-compilados (Recomendado)
 
-Acesse a página de **[GitHub Releases](https://github.com/moisesfilho/shelloma/releases)** e escolha a opção ideal para a sua distribuição Linux:
+Acesse a página de **[GitHub Releases](https://github.com/moisesfilho/shelloma/releases)** e escolha a opção ideal para o seu sistema operacional:
 
+#### 🐧 Linux
 - **Debian / Ubuntu / Linux Mint / Pop!_OS (`.deb`)**:
   ```bash
   sudo dpkg -i shelloma_1.0.2_amd64.deb
@@ -123,6 +135,23 @@ Acesse a página de **[GitHub Releases](https://github.com/moisesfilho/shelloma/
 
 - **Arquivo Comprimido Tarball (`.tar.gz`)**:
   Baixe o `.tar.gz` (`amd64` ou `arm64`), extraia o binário e mova para seu `PATH` (ex: `~/.local/bin/`).
+
+#### 🍏 macOS
+- **Binário Nativo (Intel & Apple Silicon M1/M2/M3)**:
+  1. Baixe `shelloma_1.0.2_darwin_arm64.tar.gz` (Apple Silicon) ou `shelloma_1.0.2_darwin_amd64.tar.gz` (Intel) na página de Releases.
+  2. Extraia o pacote e torne-o executável:
+     ```bash
+     tar -xzf shelloma_1.0.2_darwin_arm64.tar.gz
+     chmod +x shelloma
+     sudo mv shelloma /usr/local/bin/
+     ```
+
+#### 🪟 Windows
+- **Executável Nativamente Compilado (`.exe` / `.zip`)**:
+  1. Baixe `shelloma_1.0.2_windows_amd64.zip` (64-bit) ou `shelloma_1.0.2_windows_arm64.zip` (ARM64) na página de Releases.
+  2. Extraia o arquivo zip.
+  3. Mova o executável `shelloma.exe` para o diretório desejado (ex: `C:\Program Files\Shelloma` ou `C:\Tools\`).
+  4. *(Opcional)* Adicione o diretório às variáveis de ambiente de sistema (`PATH`) para executar `shelloma` diretamente em qualquer terminal PowerShell ou Prompt de Comando (CMD).
 
 ### Opção 2: Compilando a partir do Código-Fonte
 

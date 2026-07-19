@@ -45,4 +45,26 @@ func TestGetTranslations(t *testing.T) {
 	if esTrans.LanguageName != "Español" {
 		t.Errorf("Esperava Español, obteve %s", esTrans.LanguageName)
 	}
+
+	for _, lang := range []string{"en", "pt", "es"} {
+		tr := GetTranslations(lang)
+		if tr.ErrorPrefix == "" {
+			t.Errorf("ErrorPrefix não deveria estar vazio para %s", lang)
+		}
+		if tr.ErrorLoadingConfig == "" {
+			t.Errorf("ErrorLoadingConfig não deveria estar vazio para %s", lang)
+		}
+		if tr.NoInstructionProvided == "" {
+			t.Errorf("NoInstructionProvided não deveria estar vazio para %s", lang)
+		}
+		if tr.ExitCodeLabel == "" {
+			t.Errorf("ExitCodeLabel não deveria estar vazio para %s", lang)
+		}
+		if tr.NoClipboardUtility == "" {
+			t.Errorf("NoClipboardUtility não deveria estar vazio para %s", lang)
+		}
+		if tr.OllamaNoModelsFound == "" {
+			t.Errorf("OllamaNoModelsFound não deveria estar vazio para %s", lang)
+		}
+	}
 }

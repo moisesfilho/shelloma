@@ -48,6 +48,12 @@ type Translations struct {
 	OllamaReasonInstruction  string `json:"ollama_reason_instruction"`
 	OllamaOfflineError       string `json:"ollama_offline_error"`
 	OllamaStartSuggestion    string `json:"ollama_start_suggestion"`
+	ErrorPrefix              string `json:"error_prefix"`
+	ErrorLoadingConfig       string `json:"error_loading_config"`
+	NoInstructionProvided    string `json:"no_instruction_provided"`
+	ExitCodeLabel            string `json:"exit_code_label"`
+	NoClipboardUtility       string `json:"no_clipboard_utility"`
+	OllamaNoModelsFound      string `json:"ollama_no_models_found"`
 
 	// Help / Usage
 	HelpTitle       string `json:"help_title"`

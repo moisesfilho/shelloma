@@ -29,6 +29,7 @@ Section: utils
 Priority: optional
 Architecture: ${ARCH}
 Maintainer: Moises <moises@localhost>
+Depends: xclip | wl-clipboard | xsel
 Description: Native natural language to Shell command translator powered by Ollama.
  Native Linux CLI application written in Go to convert natural language instructions
  into executable Bash/Zsh terminal commands for Debian and Ubuntu.
@@ -87,6 +88,18 @@ JSON
             sed -i 's/"language": *"[^"]*"/"language": "'"$LANG_CHOICE"'"/' "$user_home/.config/shelloma/config.json" || true
         fi
     done
+
+    # Instalação automática do utilitário de área de transferência (clipboard) se necessário
+    if ! command -v xclip >/dev/null 2>&1 && ! command -v wl-copy >/dev/null 2>&1 && ! command -v xsel >/dev/null 2>&1; then
+        echo "📦 Instalando utilitário de área de transferência (xclip)..."
+        if command -v apt-get >/dev/null 2>&1; then
+            apt-get update -qq && apt-get install -y -qq xclip || true
+        elif command -v dnf >/dev/null 2>&1; then
+            dnf install -y xclip || true
+        elif command -v pacman >/dev/null 2>&1; then
+            pacman -S --noconfirm xclip || true
+        fi
+    fi
 fi
 EOF
 

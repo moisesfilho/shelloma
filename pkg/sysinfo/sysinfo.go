@@ -32,11 +32,21 @@ func GetSystemContext() SystemContext {
 		ctx.WorkingDir = pwd
 	}
 
-	// Shell em uso ($SHELL)
+	// Shell em uso ($SHELL ou COMSPEC no Windows)
 	shellEnv := os.Getenv("SHELL")
 	if shellEnv != "" {
-		parts := strings.Split(shellEnv, "/")
+		parts := strings.Split(strings.ReplaceAll(shellEnv, "\\", "/"), "/")
 		ctx.Shell = parts[len(parts)-1]
+	} else if runtime.GOOS == "windows" {
+		comspec := os.Getenv("COMSPEC")
+		if comspec != "" {
+			parts := strings.Split(strings.ReplaceAll(comspec, "\\", "/"), "/")
+			ctx.Shell = parts[len(parts)-1]
+		} else {
+			ctx.Shell = "powershell.exe"
+		}
+	} else if runtime.GOOS == "darwin" {
+		ctx.Shell = "zsh"
 	} else {
 		ctx.Shell = "bash"
 	}
@@ -47,13 +57,27 @@ func GetSystemContext() SystemContext {
 		ctx.IsRoot = (usr.Uid == "0")
 	}
 
-	// Ler informações da distribuição Linux (/etc/os-release)
+	if ctx.User == "" {
+		ctx.User = os.Getenv("USER")
+		if ctx.User == "" {
+			ctx.User = os.Getenv("USERNAME")
+		}
+	}
+
+	// Ler informações do SO / Distribuição
 	ctx.DistroName, ctx.DistroVer = getDistroInfo()
 
 	return ctx
 }
 
 func getDistroInfo() (string, string) {
+	if runtime.GOOS == "windows" {
+		return "Windows", ""
+	}
+	if runtime.GOOS == "darwin" {
+		return "macOS", ""
+	}
+
 	file, err := os.Open("/etc/os-release")
 	if err != nil {
 		return "Linux", ""
