@@ -5,12 +5,12 @@ VERSION=1.0.2
 
 all: build
 
-build:
+build: lint test
 	@echo "🔨 Compilando $(BINARY_NAME) (nativo local)..."
 	go build -ldflags="-s -w" -o $(BINARY_NAME) .
 	@echo "✔ Binário gerado em ./$(BINARY_NAME)"
 
-build-all: build-linux build-darwin build-windows
+build-all: lint test build-linux build-darwin build-windows
 
 build-linux:
 	@echo "🔨 Compilando binários nativos Linux (amd64 e arm64)..."
@@ -36,6 +36,21 @@ build-windows:
 test:
 	@echo "🧪 Executando suíte de testes..."
 	go test -v ./...
+
+lint:
+	@echo "🔍 Executando análise estática de código..."
+	@go vet ./...
+	@if command -v golangci-lint >/dev/null 2>&1; then \
+		golangci-lint run; \
+	elif [ -f $(shell go env GOPATH)/bin/golangci-lint ]; then \
+		$(shell go env GOPATH)/bin/golangci-lint run; \
+	elif command -v staticcheck >/dev/null 2>&1; then \
+		staticcheck ./...; \
+	elif [ -f $(shell go env GOPATH)/bin/staticcheck ]; then \
+		$(shell go env GOPATH)/bin/staticcheck ./...; \
+	else \
+		echo "💡 Dica: instale o 'golangci-lint' ou 'staticcheck' para análises estáticas ainda mais profundas."; \
+	fi
 
 deb:
 	@./scripts/build-deb.sh

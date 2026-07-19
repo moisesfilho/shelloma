@@ -100,13 +100,13 @@ func TestOllamaClientMock(t *testing.T) {
 					{Name: "qwen2.5-coder:1.5b"},
 				},
 			}
-			json.NewEncoder(w).Encode(resp)
+			_ = json.NewEncoder(w).Encode(resp)
 		case "/api/generate":
 			resp := GenerateResponse{
 				Response: "ls -la",
 				Done:     true,
 			}
-			json.NewEncoder(w).Encode(resp)
+			_ = json.NewEncoder(w).Encode(resp)
 		default:
 			http.NotFound(w, r)
 		}

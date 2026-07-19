@@ -64,7 +64,7 @@ func ConnectOrRecoverOllama(cfg config.Config, t i18n.Translations) ollama.LLMPr
 	}
 }
 
-func HandleUserAction(client ollama.LLMProvider, sysCtx sysinfo.SystemContext, cmd *string, t i18n.Translations) ui.Action {
+func HandleUserAction(client ollama.LLMProvider, _ sysinfo.SystemContext, cmd *string, t i18n.Translations) ui.Action {
 	action := ui.PromptAction(t)
 	switch action {
 	case ui.ActionExecute:

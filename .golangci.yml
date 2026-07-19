@@ -1,0 +1,17 @@
+linters:
+  enable:
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - typecheck
+    - unused
+    - revive
+    - gocritic
+
+linters-settings:
+  revive:
+    rules:
+      - name: unused-parameter
+      - name: indent-error-flow

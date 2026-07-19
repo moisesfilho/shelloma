@@ -34,10 +34,11 @@ func GetSystemContext() SystemContext {
 
 	// Shell em uso ($SHELL ou COMSPEC no Windows)
 	shellEnv := os.Getenv("SHELL")
-	if shellEnv != "" {
+	switch {
+	case shellEnv != "":
 		parts := strings.Split(strings.ReplaceAll(shellEnv, "\\", "/"), "/")
 		ctx.Shell = parts[len(parts)-1]
-	} else if runtime.GOOS == "windows" {
+	case runtime.GOOS == "windows":
 		comspec := os.Getenv("COMSPEC")
 		if comspec != "" {
 			parts := strings.Split(strings.ReplaceAll(comspec, "\\", "/"), "/")
@@ -45,9 +46,9 @@ func GetSystemContext() SystemContext {
 		} else {
 			ctx.Shell = "powershell.exe"
 		}
-	} else if runtime.GOOS == "darwin" {
+	case runtime.GOOS == "darwin":
 		ctx.Shell = "zsh"
-	} else {
+	default:
 		ctx.Shell = "bash"
 	}
 
@@ -90,11 +91,12 @@ func getDistroInfo() (string, string) {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
-		if strings.HasPrefix(line, "NAME=") {
+		switch {
+		case strings.HasPrefix(line, "NAME="):
 			name = strings.Trim(strings.TrimPrefix(line, "NAME="), `"`)
-		} else if strings.HasPrefix(line, "VERSION_ID=") {
+		case strings.HasPrefix(line, "VERSION_ID="):
 			version = strings.Trim(strings.TrimPrefix(line, "VERSION_ID="), `"`)
-		} else if strings.HasPrefix(line, "PRETTY_NAME=") && name == "Linux" {
+		case strings.HasPrefix(line, "PRETTY_NAME=") && name == "Linux":
 			name = strings.Trim(strings.TrimPrefix(line, "PRETTY_NAME="), `"`)
 		}
 	}

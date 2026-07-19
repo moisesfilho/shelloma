@@ -46,41 +46,41 @@ func CopyToClipboard(text string, t i18n.Translations) error {
 	if isCommandAvailable("wl-copy") {
 		cmd := exec.Command("wl-copy")
 		cmd.Stdin = strings.NewReader(text)
-		if err := cmd.Run(); err == nil {
+		err := cmd.Run()
+		if err == nil {
 			return nil
-		} else {
-			lastErr = err
 		}
+		lastErr = err
 	}
 
 	if isCommandAvailable("xclip") {
 		cmd := exec.Command("xclip", "-selection", "clipboard")
 		cmd.Stdin = strings.NewReader(text)
-		if err := cmd.Run(); err == nil {
+		err := cmd.Run()
+		if err == nil {
 			return nil
-		} else {
-			lastErr = err
 		}
+		lastErr = err
 	}
 
 	if isCommandAvailable("xsel") {
 		cmd := exec.Command("xsel", "--clipboard", "--input")
 		cmd.Stdin = strings.NewReader(text)
-		if err := cmd.Run(); err == nil {
+		err := cmd.Run()
+		if err == nil {
 			return nil
-		} else {
-			lastErr = err
 		}
+		lastErr = err
 	}
 
 	if isCommandAvailable("clip.exe") {
 		cmd := exec.Command("clip.exe")
 		cmd.Stdin = strings.NewReader(text)
-		if err := cmd.Run(); err == nil {
+		err := cmd.Run()
+		if err == nil {
 			return nil
-		} else {
-			lastErr = err
 		}
+		lastErr = err
 	}
 
 	if lastErr != nil {
