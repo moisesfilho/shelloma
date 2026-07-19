@@ -91,17 +91,33 @@ Para obtener la mejor generación de comandos de terminal, recomendamos modelos 
 
 ---
 
-## 📦 Guía de Instalación Simplificada de Shelloma
+## 📦 Guía de Instalación y Descargas
 
-### Opción 1: Mediante Paquete Debian (`.deb`) - Recomendado
+Los binarios y paquetes precompilados de Shelloma están disponibles para su descarga en la página oficial de **[GitHub Releases](https://github.com/moisesfilho/shelloma/releases)** (`.deb`, `.rpm`, `.tar.gz`, `.snap`, `AppImage`).
 
-Descarga el archivo `.deb` e instálalo usando:
+### Opción 1: Descarga de Paquetes Precompilados (Recomendado)
 
-```bash
-sudo dpkg -i shelloma_1.0.0_amd64.deb
-```
+Visita **[GitHub Releases](https://github.com/moisesfilho/shelloma/releases)** y elige el formato adecuado para tu distribución Linux:
 
-*Durante la instalación, un diálogo interactivo te preguntará cuál idioma deseas como predeterminado (Inglés, Portugués o Español).*
+- **Debian / Ubuntu / Linux Mint / Pop!_OS (`.deb`)**:
+  ```bash
+  sudo dpkg -i shelloma_1.0.0_amd64.deb
+  ```
+  *(Durante la instalación del paquete `.deb`, se mostrará un asistente interactivo para elegir el idioma).*
+
+- **Fedora / RedHat / CentOS / RHEL (`.rpm`)**:
+  ```bash
+  sudo rpm -i shelloma_1.0.0_amd64.rpm
+  ```
+
+- **AppImage (Universal - Binario portátil sin necesidad de instalación)**:
+  ```bash
+  chmod +x Shelloma-x86_64.AppImage
+  ./Shelloma-x86_64.AppImage "listar archivos del directorio"
+  ```
+
+- **Archivo Comprimido Tarball (`.tar.gz`)**:
+  Descarga el `.tar.gz` (`amd64` o `arm64`), extrae el binario y muévelo a tu `PATH` (ej: `~/.local/bin/`).
 
 ### Opción 2: Compilar desde el Código Fuente
 

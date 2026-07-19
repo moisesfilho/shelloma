@@ -91,17 +91,33 @@ For optimal terminal command generation, we recommend code-focused models. Run `
 
 ---
 
-## 📦 Simplified Shelloma Installation Guide
+## 📦 Installation Guide & Downloads
 
-### Option 1: Debian Package (`.deb`) - Recommended
+Pre-compiled binaries and packages for Shelloma are available for download on the official **[GitHub Releases Page](https://github.com/moisesfilho/shelloma/releases)** (`.deb`, `.rpm`, `.tar.gz`, `.snap`, `AppImage`).
 
-Download the latest `.deb` package and install it using:
+### Option 1: Pre-compiled Packages & Downloads (Recommended)
 
-```bash
-sudo dpkg -i shelloma_1.0.0_amd64.deb
-```
+Visit **[GitHub Releases](https://github.com/moisesfilho/shelloma/releases)** and choose the right format for your Linux distribution:
 
-*During installation, an interactive prompt will ask you to select the default application language (English, Portuguese, or Spanish).*
+- **Debian / Ubuntu / Linux Mint / Pop!_OS (`.deb`)**:
+  ```bash
+  sudo dpkg -i shelloma_1.0.0_amd64.deb
+  ```
+  *(During `.deb` installation, an interactive prompt asks for your preferred default language).*
+
+- **Fedora / RedHat / CentOS / RHEL (`.rpm`)**:
+  ```bash
+  sudo rpm -i shelloma_1.0.0_amd64.rpm
+  ```
+
+- **AppImage (Universal - Standalone portable binary)**:
+  ```bash
+  chmod +x Shelloma-x86_64.AppImage
+  ./Shelloma-x86_64.AppImage "list files in directory"
+  ```
+
+- **Tarball Archive (`.tar.gz`)**:
+  Download `.tar.gz` (`amd64` or `arm64`), extract the binary, and place it in your `PATH` (e.g., `~/.local/bin/`).
 
 ### Option 2: Build from Source
 
