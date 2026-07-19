@@ -28,8 +28,10 @@ jobs:
       - name: Install System Packaging Tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y rpm libfuse2
+          sudo apt-get install -y rpm libfuse2 flatpak flatpak-builder
           sudo snap install snapcraft --classic
+          flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+          flatpak install --user -y flathub org.freedesktop.Platform//23.08 org.freedesktop.Sdk//23.08
 
       - name: Run GoReleaser (deb, rpm, tar.gz, snap, binaries)
         uses: goreleaser/goreleaser-action@v6
@@ -40,14 +42,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build AppImage
+      - name: Build AppImage and Flatpak
         run: |
-          chmod +x scripts/build-appimage.sh
+          chmod +x scripts/build-appimage.sh scripts/build-flatpak.sh
           ./scripts/build-appimage.sh
+          ./scripts/build-flatpak.sh
 
-      - name: Upload AppImage to GitHub Release
+      - name: Upload AppImage and Flatpak to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/*.AppImage
+          files: |
+            dist/*.AppImage
+            dist/*.flatpak
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

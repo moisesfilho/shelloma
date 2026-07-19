@@ -1,7 +1,7 @@
-.PHONY: all build build-all deb tar appimage install-user test clean help release-snapshot
+.PHONY: all build build-all deb tar appimage flatpak install-user test clean help release-snapshot
 
 BINARY_NAME=shelloma
-VERSION=1.0.0
+VERSION=1.0.1
 
 all: build
 
@@ -34,6 +34,9 @@ tar: build-all
 appimage: build
 	@./scripts/build-appimage.sh
 
+flatpak: build
+	@./scripts/build-flatpak.sh
+
 release-snapshot:
 	@echo "🚀 Testando build de release com GoReleaser (modo snapshot local)..."
 	goreleaser release --snapshot --clean
@@ -45,7 +48,7 @@ install-user: build
 	@echo "✔ $(BINARY_NAME) instalado com sucesso em $(HOME)/.local/bin/$(BINARY_NAME)"
 
 clean:
-	@rm -rf $(BINARY_NAME) build dist *.deb *.rpm *.AppImage appimagetool
+	@rm -rf $(BINARY_NAME) build dist *.deb *.rpm *.AppImage *.flatpak appimagetool
 	@echo "🧹 Limpeza concluída."
 
 help:

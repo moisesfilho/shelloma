@@ -1,0 +1,18 @@
+app-id: org.shelloma.Shelloma
+runtime: org.freedesktop.Platform
+runtime-version: '23.08'
+sdk: org.freedesktop.Sdk
+command: shelloma
+finish-args:
+  - --share=network
+  - --filesystem=host
+
+modules:
+  - name: shelloma
+    buildsystem: simple
+    build-commands:
+      - install -D -m 755 shelloma /app/bin/shelloma
+      - install -D -m 644 scripts/shelloma.desktop /app/share/applications/org.shelloma.Shelloma.desktop
+    sources:
+      - type: dir
+        path: ..

@@ -93,7 +93,7 @@ Para obter as melhores respostas de comandos de terminal Linux, recomendamos uti
 
 ## 📦 Guia de Instalação e Downloads
 
-Todos os binários e pacotes pré-compilados do Shelloma estão disponíveis para download na página oficial de **[Releases no GitHub](https://github.com/moisesfilho/shelloma/releases)** (`.deb`, `.rpm`, `.tar.gz`, `.snap`, `AppImage`).
+Todos os binários e pacotes pré-compilados do Shelloma estão disponíveis para download na página oficial de **[Releases no GitHub](https://github.com/moisesfilho/shelloma/releases)** (`.deb`, `.rpm`, `.tar.gz`, `.snap`, `AppImage`, `.flatpak`).
 
 ### Opção 1: Download de Binários e Pacotes Pré-compilados (Recomendado)
 
@@ -101,13 +101,18 @@ Acesse a página de **[GitHub Releases](https://github.com/moisesfilho/shelloma/
 
 - **Debian / Ubuntu / Linux Mint / Pop!_OS (`.deb`)**:
   ```bash
-  sudo dpkg -i shelloma_1.0.0_amd64.deb
+  sudo dpkg -i shelloma_1.0.1_amd64.deb
   ```
   *(Durante a instalação do `.deb`, será exibido um assistente no terminal para selecionar o idioma padrão).*
 
 - **Fedora / RedHat / CentOS / RHEL (`.rpm`)**:
   ```bash
-  sudo rpm -i shelloma_1.0.0_amd64.rpm
+  sudo rpm -i shelloma_1.0.1_amd64.rpm
+  ```
+
+- **Flatpak (Universal)**:
+  ```bash
+  flatpak install Shelloma-x86_64.flatpak
   ```
 
 - **AppImage (Universal - Executável portável sem necessidade de instalação)**:
