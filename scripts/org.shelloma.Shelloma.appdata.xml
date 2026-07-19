@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>org.shelloma.Shelloma</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Shelloma</name>
+  <summary>Native natural language to Shell command translator powered by Ollama</summary>
+  <description>
+    <p>
+      Shelloma is a native Linux CLI application written in Go that translates natural language instructions directly into executable terminal commands (Bash/Zsh) using local LLM models via Ollama.
+    </p>
+  </description>
+  <launchable type="desktop-id">org.shelloma.Shelloma.desktop</launchable>
+  <url type="homepage">https://github.com/moisesfilho/shelloma</url>
+  <provides>
+    <binary>shelloma</binary>
+  </provides>
+</component>

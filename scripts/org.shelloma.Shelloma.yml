@@ -13,6 +13,9 @@ modules:
     build-commands:
       - install -D -m 755 shelloma /app/bin/shelloma
       - install -D -m 644 scripts/shelloma.desktop /app/share/applications/org.shelloma.Shelloma.desktop
+      - install -D -m 644 scripts/org.shelloma.Shelloma.appdata.xml /app/share/metainfo/org.shelloma.Shelloma.appdata.xml
+      - mkdir -p /app/share/icons/hicolor/64x64/apps
+      - echo '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#2d3748"/><text x="12" y="42" font-family="monospace" font-size="32" fill="#48bb78" font-weight="bold">&gt;_</text></svg>' > /app/share/icons/hicolor/64x64/apps/org.shelloma.Shelloma.svg
     sources:
       - type: dir
         path: ..

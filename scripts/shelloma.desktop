@@ -2,7 +2,7 @@
 Type=Application
 Name=Shelloma
 Exec=shelloma
-Icon=shelloma
+Icon=org.shelloma.Shelloma
 Comment=Native natural language to Shell command translator powered by Ollama
 Categories=Utility;System;
 Terminal=true

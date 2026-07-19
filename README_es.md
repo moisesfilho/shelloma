@@ -101,13 +101,13 @@ Visita **[GitHub Releases](https://github.com/moisesfilho/shelloma/releases)** y
 
 - **Debian / Ubuntu / Linux Mint / Pop!_OS (`.deb`)**:
   ```bash
-  sudo dpkg -i shelloma_1.0.1_amd64.deb
+  sudo dpkg -i shelloma_1.0.2_amd64.deb
   ```
   *(Durante la instalación del paquete `.deb`, se mostrará un asistente interactivo para elegir el idioma).*
 
 - **Fedora / RedHat / CentOS / RHEL (`.rpm`)**:
   ```bash
-  sudo rpm -i shelloma_1.0.1_amd64.rpm
+  sudo rpm -i shelloma_1.0.2_amd64.rpm
   ```
 
 - **Flatpak (Universal)**:

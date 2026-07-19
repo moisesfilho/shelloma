@@ -1,7 +1,7 @@
 .PHONY: all build build-all deb tar appimage flatpak install-user test clean help release-snapshot
 
 BINARY_NAME=shelloma
-VERSION=1.0.1
+VERSION=1.0.2
 
 all: build
 
