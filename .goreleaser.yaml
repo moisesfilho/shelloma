@@ -56,7 +56,7 @@ nfpms:
       - src: scripts/shelloma.desktop
         dst: /usr/share/applications/shelloma.desktop
 
-snaps:
+snapcrafts:
   - id: shelloma
     name: shelloma
     summary: "Native natural language to Shell command translator powered by Ollama"
