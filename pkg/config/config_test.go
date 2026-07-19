@@ -29,8 +29,10 @@ func TestSaveAndLoadConfig(t *testing.T) {
 	}
 	defer os.RemoveAll(tempDir)
 
-	// Sobrescrever temporariamente o diretório de HOME
+	// Sobrescrever temporariamente os diretórios de configuração do usuário
 	t.Setenv("HOME", tempDir)
+	t.Setenv("XDG_CONFIG_HOME", filepath.Join(tempDir, ".config"))
+	t.Setenv("AppData", filepath.Join(tempDir, "AppData", "Roaming"))
 
 	cfg := Config{
 		OllamaURL:   "http://127.0.0.1:11434",
