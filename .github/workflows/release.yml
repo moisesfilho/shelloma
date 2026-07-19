@@ -26,12 +26,31 @@ jobs:
           cache: false
 
       - name: Run golangci-lint
+        id: golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
           version: latest
 
       - name: Run Unit Tests
-        run: go test -v ./...
+        id: run-tests
+        run: |
+          set -o pipefail
+          go test -v ./... | tee test_output.txt
+
+      - name: Add Quality Gate Summary
+        if: always()
+        run: |
+          echo "## 🛡️ Summary de Qualidade (Quality Gate)" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.golangci-lint.outcome }}" == "success" ]; then
+            echo "- ✅ **golangci-lint**: 0 problemas identificados" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ❌ **golangci-lint**: Falha no linting" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ "${{ steps.run-tests.outcome }}" == "success" ]; then
+            echo "- ✅ **Testes Unitários**: Todos os pacotes validados" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ❌ **Testes Unitários**: Falha nos testes" >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: Install System Packaging Tools
         run: |
