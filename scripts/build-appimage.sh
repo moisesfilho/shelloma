@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
+export APPIMAGE_EXTRACT_AND_RUN=1
+
 ARCH=${ARCH:-x86_64}
 APP_DIR="build/AppDir"
 OUTPUT_DIR="dist"

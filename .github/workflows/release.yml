@@ -28,7 +28,8 @@ jobs:
       - name: Install System Packaging Tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y rpm snapcraft
+          sudo apt-get install -y rpm libfuse2
+          sudo snap install snapcraft --classic
 
       - name: Run GoReleaser (deb, rpm, tar.gz, snap, binaries)
         uses: goreleaser/goreleaser-action@v6
