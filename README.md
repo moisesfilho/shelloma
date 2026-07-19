@@ -113,13 +113,13 @@ Visit **[GitHub Releases](https://github.com/moisesfilho/shelloma/releases)** an
 #### 🐧 Linux
 - **Debian / Ubuntu / Linux Mint / Pop!_OS (`.deb`)**:
   ```bash
-  sudo dpkg -i shelloma_1.0.2_amd64.deb
+  sudo dpkg -i shelloma_1.1.0_amd64.deb
   ```
   *(During `.deb` installation, an interactive prompt asks for your preferred default language).*
 
 - **Fedora / RedHat / CentOS / RHEL (`.rpm`)**:
   ```bash
-  sudo rpm -i shelloma_1.0.2_amd64.rpm
+  sudo rpm -i shelloma_1.1.0_amd64.rpm
   ```
 
 - **Flatpak (Universal)**:
@@ -138,17 +138,17 @@ Visit **[GitHub Releases](https://github.com/moisesfilho/shelloma/releases)** an
 
 #### 🍏 macOS
 - **Native Binary (Intel & Apple Silicon M1/M2/M3)**:
-  1. Download `shelloma_1.0.2_darwin_arm64.tar.gz` (Apple Silicon) or `shelloma_1.0.2_darwin_amd64.tar.gz` (Intel) from Releases.
+  1. Download `shelloma_1.1.0_darwin_arm64.tar.gz` (Apple Silicon) or `shelloma_1.1.0_darwin_amd64.tar.gz` (Intel) from Releases.
   2. Extract and make it executable:
      ```bash
-     tar -xzf shelloma_1.0.2_darwin_arm64.tar.gz
+     tar -xzf shelloma_1.1.0_darwin_arm64.tar.gz
      chmod +x shelloma
      sudo mv shelloma /usr/local/bin/
      ```
 
 #### 🪟 Windows
 - **Native Executable (`.exe` / `.zip`)**:
-  1. Download `shelloma_1.0.2_windows_amd64.zip` (64-bit) or `shelloma_1.0.2_windows_arm64.zip` (ARM64) from Releases.
+  1. Download `shelloma_1.1.0_windows_amd64.zip` (64-bit) or `shelloma_1.1.0_windows_arm64.zip` (ARM64) from Releases.
   2. Extract the zip archive.
   3. Move `shelloma.exe` to a folder on your system (e.g., `C:\Program Files\Shelloma` or `C:\Tools\`).
   4. *(Optional)* Add the directory path to system Environment Variables (`PATH`) to run `shelloma` directly from any PowerShell or Command Prompt (CMD).
@@ -228,6 +228,34 @@ Options:
   -y, --yes            Execute generated command automatically without confirmation
   -v, --version        Display Shelloma version
 ```
+
+---
+
+## 🧪 Development & Code Quality
+
+Shelloma follows strict **Clean Code** principles, the **Single Responsibility Principle (SRP)**, and a **Package by Feature** architecture:
+
+- **`pkg/cli`**: Command-line orchestration, flag parsing, and interactive loop.
+- **`pkg/ui`**: Terminal visual UI, card rendering, ANSI styling, and clipboard integration.
+- **`pkg/ollama`**: Ollama API client, prompt cleaning, and execution diagnostics.
+- **`pkg/sysinfo`**: Operating system, Linux distribution, shell, and user detection.
+- **`pkg/config`**: User configuration management and persistence.
+- **`pkg/i18n`**: Native embedded internationalization (English, Portuguese, Spanish).
+
+### Static Analysis & Automation
+
+```bash
+# Run unit test suite
+make test
+
+# Run static code analysis (golangci-lint / staticcheck / go vet)
+make lint
+
+# Build local binary (runs lint and test automatically before compiling)
+make build
+```
+
+The project includes integration with **`golangci-lint`** and a **Git Pre-Commit Hook** (`.git/hooks/pre-commit`) that automatically runs static analysis and unit tests on every commit and build.
 
 ---
 

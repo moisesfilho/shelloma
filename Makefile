@@ -1,7 +1,7 @@
 .PHONY: all build build-all build-linux build-darwin build-windows deb tar appimage flatpak install-user test clean help release-snapshot
 
 BINARY_NAME=shelloma
-VERSION=1.0.2
+VERSION=1.1.0
 
 all: build
 

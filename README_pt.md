@@ -113,13 +113,13 @@ Acesse a página de **[GitHub Releases](https://github.com/moisesfilho/shelloma/
 #### 🐧 Linux
 - **Debian / Ubuntu / Linux Mint / Pop!_OS (`.deb`)**:
   ```bash
-  sudo dpkg -i shelloma_1.0.2_amd64.deb
+  sudo dpkg -i shelloma_1.1.0_amd64.deb
   ```
   *(Durante a instalação do `.deb`, será exibido um assistente no terminal para selecionar o idioma padrão).*
 
 - **Fedora / RedHat / CentOS / RHEL (`.rpm`)**:
   ```bash
-  sudo rpm -i shelloma_1.0.2_amd64.rpm
+  sudo rpm -i shelloma_1.1.0_amd64.rpm
   ```
 
 - **Flatpak (Universal)**:
@@ -138,17 +138,17 @@ Acesse a página de **[GitHub Releases](https://github.com/moisesfilho/shelloma/
 
 #### 🍏 macOS
 - **Binário Nativo (Intel & Apple Silicon M1/M2/M3)**:
-  1. Baixe `shelloma_1.0.2_darwin_arm64.tar.gz` (Apple Silicon) ou `shelloma_1.0.2_darwin_amd64.tar.gz` (Intel) na página de Releases.
+  1. Baixe `shelloma_1.1.0_darwin_arm64.tar.gz` (Apple Silicon) ou `shelloma_1.1.0_darwin_amd64.tar.gz` (Intel) na página de Releases.
   2. Extraia o pacote e torne-o executável:
      ```bash
-     tar -xzf shelloma_1.0.2_darwin_arm64.tar.gz
+     tar -xzf shelloma_1.1.0_darwin_arm64.tar.gz
      chmod +x shelloma
      sudo mv shelloma /usr/local/bin/
      ```
 
 #### 🪟 Windows
 - **Executável Nativamente Compilado (`.exe` / `.zip`)**:
-  1. Baixe `shelloma_1.0.2_windows_amd64.zip` (64-bit) ou `shelloma_1.0.2_windows_arm64.zip` (ARM64) na página de Releases.
+  1. Baixe `shelloma_1.1.0_windows_amd64.zip` (64-bit) ou `shelloma_1.1.0_windows_arm64.zip` (ARM64) na página de Releases.
   2. Extraia o arquivo zip.
   3. Mova o executável `shelloma.exe` para o diretório desejado (ex: `C:\Program Files\Shelloma` ou `C:\Tools\`).
   4. *(Opcional)* Adicione o diretório às variáveis de ambiente de sistema (`PATH`) para executar `shelloma` diretamente em qualquer terminal PowerShell ou Prompt de Comando (CMD).
@@ -228,6 +228,34 @@ Opções:
   -y, --yes            Executar o comando gerado automaticamente sem confirmação
   -v, --version        Exibir versão do Shelloma
 ```
+
+---
+
+## 🧪 Desenvolvimento & Qualidade de Código
+
+O Shelloma adota práticas estritas de **Clean Code**, **Princípio de Responsabilidade Única (SRP)** e arquitetura organizada por funcionalidade (**Package by Feature**):
+
+- **`pkg/cli`**: Orquestração da linha de comando, leitura de flags e fluxo interativo.
+- **`pkg/ui`**: Interface visual de terminal, renderização de cards, estilos ANSI e área de transferência.
+- **`pkg/ollama`**: Cliente da API do Ollama, limpeza de prompts e diagnósticos de execução.
+- **`pkg/sysinfo`**: Detecção de sistema operacional, distribuição Linux, shell e usuário.
+- **`pkg/config`**: Gestão e persistência das configurações do usuário.
+- **`pkg/i18n`**: Suporte nativo e embutido para internacionalização (inglês, português e espanhol).
+
+### Análise Estática & Automação
+
+```bash
+# Executar suíte de testes unitários
+make test
+
+# Executar análise estática de código (golangci-lint / staticcheck / go vet)
+make lint
+
+# Compilar binário local (executa lint e test antes da compilação)
+make build
+```
+
+O projeto inclui integração com **`golangci-lint`** e um **Git Pre-Commit Hook** (`.git/hooks/pre-commit`) que executa automaticamente a verificação estática de código e os testes unitários a cada commit e build.
 
 ---
 

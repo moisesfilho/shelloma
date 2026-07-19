@@ -113,13 +113,13 @@ Visita **[GitHub Releases](https://github.com/moisesfilho/shelloma/releases)** y
 #### 🐧 Linux
 - **Debian / Ubuntu / Linux Mint / Pop!_OS (`.deb`)**:
   ```bash
-  sudo dpkg -i shelloma_1.0.2_amd64.deb
+  sudo dpkg -i shelloma_1.1.0_amd64.deb
   ```
   *(Durante la instalación del paquete `.deb`, se mostrará un asistente interactivo para elegir el idioma).*
 
 - **Fedora / RedHat / CentOS / RHEL (`.rpm`)**:
   ```bash
-  sudo rpm -i shelloma_1.0.2_amd64.rpm
+  sudo rpm -i shelloma_1.1.0_amd64.rpm
   ```
 
 - **Flatpak (Universal)**:
@@ -138,17 +138,17 @@ Visita **[GitHub Releases](https://github.com/moisesfilho/shelloma/releases)** y
 
 #### 🍏 macOS
 - **Binario Nativo (Intel y Apple Silicon M1/M2/M3)**:
-  1. Descarga `shelloma_1.0.2_darwin_arm64.tar.gz` (Apple Silicon) o `shelloma_1.0.2_darwin_amd64.tar.gz` (Intel) en Releases.
+  1. Descarga `shelloma_1.1.0_darwin_arm64.tar.gz` (Apple Silicon) o `shelloma_1.1.0_darwin_amd64.tar.gz` (Intel) en Releases.
   2. Extrae el paquete y hazlo ejecutable:
      ```bash
-     tar -xzf shelloma_1.0.2_darwin_arm64.tar.gz
+     tar -xzf shelloma_1.1.0_darwin_arm64.tar.gz
      chmod +x shelloma
      sudo mv shelloma /usr/local/bin/
      ```
 
 #### 🪟 Windows
 - **Ejecutable Nativo (`.exe` / `.zip`)**:
-  1. Descarga `shelloma_1.0.2_windows_amd64.zip` (64-bit) o `shelloma_1.0.2_windows_arm64.zip` (ARM64) desde Releases.
+  1. Descarga `shelloma_1.1.0_windows_amd64.zip` (64-bit) o `shelloma_1.1.0_windows_arm64.zip` (ARM64) desde Releases.
   2. Extrae el archivo zip.
   3. Mueve `shelloma.exe` a una carpeta de tu sistema (ej: `C:\Program Files\Shelloma` o `C:\Tools\`).
   4. *(Opcional)* Añade la ruta del directorio a las Variables de Entorno del sistema (`PATH`) para ejecutar `shelloma` directamente desde cualquier PowerShell o Símbolo del sistema (CMD).
@@ -231,6 +231,34 @@ Opciones:
 
 ---
 
+## 🧪 Desarrollo y Calidad de Código
+
+Shelloma adopta prácticas estrictas de **Clean Code**, el **Principio de Responsabilidad Única (SRP)** y una arquitectura organizada por funcionalidad (**Package by Feature**):
+
+- **`pkg/cli`**: Orquestación de línea de comandos, lectura de flags y flujo interactivo.
+- **`pkg/ui`**: Interfaz visual de terminal, renderizado de cards, estilos ANSI y portapapeles.
+- **`pkg/ollama`**: Cliente de la API de Ollama, limpieza de prompts y diagnósticos de ejecución.
+- **`pkg/sysinfo`**: Detección de sistema operativo, distribución Linux, shell y usuario.
+- **`pkg/config`**: Gestión y persistencia de las configuraciones del usuario.
+- **`pkg/i18n`**: Soporte nativo e integrado para internacionalización (inglés, portugués y español).
+
+### Análisis Estático y Automatización
+
+```bash
+# Ejecutar suite de pruebas unitarias
+make test
+
+# Ejecutar análisis estático de código (golangci-lint / staticcheck / go vet)
+make lint
+
+# Compilar binario local (ejecuta lint y test automáticamente antes de compilar)
+make build
+```
+
+El proyecto incluye integración con **`golangci-lint`** y un **Git Pre-Commit Hook** (`.git/hooks/pre-commit`) que ejecuta automáticamente la verificación estática de código y las pruebas unitarias en cada commit y compilación.
+
+---
+
 ## 📄 Licencia
 
-Este proyecto está bajo la Licencia **MIT** - consulta el archivo [LICENSE](LICENSE) para más detalles.
+Este proyecto está licenciado bajo la licencia **MIT** - consulte el archivo [LICENSE](LICENSE) para obtener más detalles.

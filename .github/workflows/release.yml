@@ -25,6 +25,14 @@ jobs:
           go-version: '1.22'
           cache: false
 
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.60.3
+
+      - name: Run Unit Tests
+        run: go test -v ./...
+
       - name: Install System Packaging Tools
         run: |
           sudo apt-get update
