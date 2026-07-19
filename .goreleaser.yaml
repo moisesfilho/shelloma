@@ -1,0 +1,73 @@
+# Configuration for GoReleaser (https://goreleaser.com)
+version: 2
+
+project_name: shelloma
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: shelloma
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    main: .
+    binary: shelloma
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+
+archives:
+  - id: default
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format: tar.gz
+    files:
+      - README.md
+      - README_pt.md
+      - README_es.md
+      - LICENSE
+      - scripts/postinstall.sh
+      - scripts/shelloma.desktop
+
+nfpms:
+  - id: packages
+    package_name: shelloma
+    file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Arch }}"
+    vendor: Shelloma
+    homepage: "https://github.com/moisesfilho/shelloma"
+    maintainer: "Moises <moises@localhost>"
+    description: "Native natural language to Shell command translator powered by Ollama"
+    license: "MIT"
+    formats:
+      - deb
+      - rpm
+    bindir: /usr/bin
+    section: utils
+    priority: optional
+    scripts:
+      postinstall: scripts/postinstall.sh
+    contents:
+      - src: scripts/shelloma.desktop
+        dst: /usr/share/applications/shelloma.desktop
+
+snaps:
+  - id: shelloma
+    name: shelloma
+    summary: "Native natural language to Shell command translator powered by Ollama"
+    description: "Native Linux CLI application written in Go to convert natural language instructions into executable Bash/Zsh terminal commands."
+    grade: stable
+    confinement: classic
+    publish: false
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"

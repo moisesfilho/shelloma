@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Shelloma
+Exec=shelloma
+Icon=shelloma
+Comment=Native natural language to Shell command translator powered by Ollama
+Categories=Utility;System;TerminalEmitter;
+Terminal=true
