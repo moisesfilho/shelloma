@@ -53,7 +53,7 @@ nfpms:
     formats:
       - deb
       - rpm
-    depends:
+    dependencies:
       - "xclip | wl-clipboard | xsel"
     recommends:
       - xclip
