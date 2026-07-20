@@ -27,7 +27,7 @@ jobs:
 
       - name: Run golangci-lint
         id: golangci-lint
-        uses: golangci/golangci-lint-action@v9
+        uses: golangci/golangci-lint-action@v6.5.0
         with:
           version: v1.64.0
           skip-cache: true
