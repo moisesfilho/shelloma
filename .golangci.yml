@@ -1,17 +1,24 @@
+version: "2"
+
 linters:
   enable:
     - errcheck
-    - gosimple
     - govet
     - ineffassign
     - staticcheck
-    - typecheck
     - unused
     - revive
     - gocritic
-
-linters-settings:
-  revive:
+  settings:
+    revive:
+      rules:
+        - name: unused-parameter
+        - name: indent-error-flow
+  exclusions:
     rules:
-      - name: unused-parameter
-      - name: indent-error-flow
+      - linters:
+          - errcheck
+        text: "Error return value of .*(Close|RemoveAll).* is not checked"
+      - linters:
+          - staticcheck
+        text: "(QF1003|ST1005)"
