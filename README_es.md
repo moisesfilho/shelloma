@@ -218,6 +218,28 @@ shelloma config set model qwen2.5-coder:1.5b
 shelloma models
 ```
 
+### ⚠️ Protección de Comandos Peligrosos
+
+Para evitar daños accidentales al sistema, Shelloma incluye una validación de seguridad para comandos potencialmente peligrosos (por ejemplo, `rm`, `dd`, `mkfs`, `shred`, `chmod`, `chown`).
+
+- **Alertas**: Cuando se sugiere un comando peligroso, se muestra un aviso de advertencia visual inmediatamente debajo de la tarjeta de comando.
+- **Palabra de Seguridad**: Si intenta ejecutar un comando peligroso, se le pedirá que escriba la palabra de seguridad `"CONFIRM"` (se distinguen mayúsculas y minúsculas) para continuar. Si se escribe incorrectamente, la ejecución se cancelará.
+- **Lista Configurable**: La lista de comandos peligrosos es totalmente editable.
+- **Desactivar Verificaciones de Seguridad**: Puede omitir esta validación por completo si lo desea.
+
+#### Comandos de Configuración:
+
+```bash
+# Agregar/cambiar la lista de comandos peligrosos (lista separada por comas)
+shelloma config set dangerous "rm,dd,mkfs,shred,chmod,chown,fdisk"
+
+# Desactivar completamente la verificación de comandos peligrosos
+shelloma config set disable_dangerous_check true
+
+# Activar la verificación nuevamente (predeterminado)
+shelloma config set disable_dangerous_check false
+```
+
 ### Banderas de Comando
 
 ```text

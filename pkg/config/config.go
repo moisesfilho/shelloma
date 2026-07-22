@@ -5,23 +5,28 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 type Config struct {
-	OllamaURL   string  `json:"ollama_url"`
-	Model       string  `json:"model"`
-	Temperature float64 `json:"temperature"`
-	AutoExecute bool    `json:"auto_execute"`
-	Language    string  `json:"language"`
+	OllamaURL             string   `json:"ollama_url"`
+	Model                 string   `json:"model"`
+	Temperature           float64  `json:"temperature"`
+	AutoExecute           bool     `json:"auto_execute"`
+	Language              string   `json:"language"`
+	DangerousCommands     []string `json:"dangerous_commands"`
+	DisableDangerousCheck bool     `json:"disable_dangerous_check"`
 }
 
 func DefaultConfig() Config {
 	return Config{
-		OllamaURL:   "http://localhost:11434",
-		Model:       "",   // Vazio para detecção automática
-		Temperature: 0.1,
-		AutoExecute: false,
-		Language:    "en", // Idioma padrão: Inglês
+		OllamaURL:             "http://localhost:11434",
+		Model:                 "", // Vazio para detecção automática
+		Temperature:           0.1,
+		AutoExecute:           false,
+		Language:              "en", // Idioma padrão: Inglês
+		DangerousCommands:     []string{"rm", "dd", "mkfs", "shred", "chmod", "chown"},
+		DisableDangerousCheck: false,
 	}
 }
 
@@ -59,6 +64,10 @@ func LoadConfig() (Config, error) {
 					cfg.Temperature = sysCfg.Temperature
 				}
 				cfg.AutoExecute = sysCfg.AutoExecute
+				if len(sysCfg.DangerousCommands) > 0 {
+					cfg.DangerousCommands = sysCfg.DangerousCommands
+				}
+				cfg.DisableDangerousCheck = sysCfg.DisableDangerousCheck
 			}
 		}
 	}
@@ -83,6 +92,10 @@ func LoadConfig() (Config, error) {
 					cfg.Temperature = userCfg.Temperature
 				}
 				cfg.AutoExecute = userCfg.AutoExecute
+				if len(userCfg.DangerousCommands) > 0 {
+					cfg.DangerousCommands = userCfg.DangerousCommands
+				}
+				cfg.DisableDangerousCheck = userCfg.DisableDangerousCheck
 			}
 		} else if os.IsNotExist(err) {
 			// Se o arquivo do usuário ainda não existir, salva mesclando com /etc/shelloma/config.json
@@ -92,6 +105,10 @@ func LoadConfig() (Config, error) {
 
 	if cfg.Language == "" {
 		cfg.Language = "en"
+	}
+
+	if len(cfg.DangerousCommands) == 0 {
+		cfg.DangerousCommands = DefaultConfig().DangerousCommands
 	}
 
 	return cfg, nil
@@ -114,4 +131,20 @@ func SaveConfig(cfg Config) error {
 	}
 
 	return os.WriteFile(path, data, 0644)
+}
+
+// CheckDangerous checks if the command string uses any command from the dangerous list.
+// It splits the command by shell syntax delimiters and checks for exact matches of words.
+func CheckDangerous(cmd string, dangerousList []string) (bool, string) {
+	words := strings.FieldsFunc(cmd, func(r rune) bool {
+		return r == ' ' || r == '\t' || r == '\n' || r == ';' || r == '|' || r == '&' || r == '`' || r == '(' || r == ')' || r == '$' || r == '<' || r == '>' || r == '"' || r == '\''
+	})
+	for _, word := range words {
+		for _, dangerous := range dangerousList {
+			if word == dangerous {
+				return true, dangerous
+			}
+		}
+	}
+	return false, ""
 }

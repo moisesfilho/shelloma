@@ -3,6 +3,8 @@ package ui
 import (
 	"fmt"
 	"strings"
+
+	"shelloma/pkg/i18n"
 )
 
 func PrintBanner(modelName string, lang string) {
@@ -31,4 +33,8 @@ func PrintCommandCard(cmd string) {
 	}
 	fmt.Printf("%s└%s┘%s\n", Cyan, border, Reset)
 	fmt.Println()
+}
+
+func PrintDangerousWarning(matchedCmd string, t i18n.Translations) {
+	fmt.Printf("%s%s⚠️  %s%s\n", Bold, Red, fmt.Sprintf(t.DangerousCommandWarning, matchedCmd), Reset)
 }

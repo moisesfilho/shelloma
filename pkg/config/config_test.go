@@ -72,3 +72,32 @@ func TestSaveAndLoadConfig(t *testing.T) {
 		t.Errorf("Esperava AutoExecute %t, obteve %t", cfg.AutoExecute, loadedCfg.AutoExecute)
 	}
 }
+
+func TestCheckDangerous(t *testing.T) {
+	dangerousList := []string{"rm", "dd", "chmod"}
+
+	tests := []struct {
+		cmd      string
+		expected bool
+		matched  string
+	}{
+		{"ls -la", false, ""},
+		{"rm -rf /", true, "rm"},
+		{"sudo rm file", true, "rm"},
+		{"cat file.txt | rm", true, "rm"},
+		{"dd if=/dev/zero of=/dev/null", true, "dd"},
+		{"echo \"chmod\"", true, "chmod"},
+		{"chmod 755 script.sh", true, "chmod"},
+		{"formated", false, ""},
+	}
+
+	for _, tt := range tests {
+		ok, matched := CheckDangerous(tt.cmd, dangerousList)
+		if ok != tt.expected {
+			t.Errorf("CheckDangerous(%q) = %t, expected %t", tt.cmd, ok, tt.expected)
+		}
+		if matched != tt.matched {
+			t.Errorf("CheckDangerous(%q) matched %q, expected %q", tt.cmd, matched, tt.matched)
+		}
+	}
+}

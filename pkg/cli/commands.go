@@ -42,6 +42,14 @@ func HandleConfigCommand(cfg config.Config, args []string, t i18n.Translations) 
 		case "lang", "language":
 			cfg.Language = string(i18n.NormalizeLanguage(val))
 			t = i18n.GetTranslations(cfg.Language)
+		case "dangerous_commands", "dangerous":
+			commands := strings.Split(val, ",")
+			for i, cmd := range commands {
+				commands[i] = strings.TrimSpace(cmd)
+			}
+			cfg.DangerousCommands = commands
+		case "disable_dangerous_check":
+			cfg.DisableDangerousCheck = val == "true" || val == "1" || val == "yes"
 		default:
 			fmt.Printf("%s%s: %s%s\n", ui.Red, t.UnknownKey, key, ui.Reset)
 			os.Exit(1)
@@ -58,9 +66,11 @@ func HandleConfigCommand(cfg config.Config, args []string, t i18n.Translations) 
 
 	path, _ := config.GetConfigPath()
 	fmt.Printf("%s%s (%s):%s\n", ui.Bold+ui.Cyan, t.CurrentConfig, path, ui.Reset)
-	fmt.Printf("  ollama_url:   %s\n", cfg.OllamaURL)
-	fmt.Printf("  model:        %s %s\n", cfg.Model, t.DefaultModelAuto)
-	fmt.Printf("  language:     %s (%s)\n", cfg.Language, i18n.GetTranslations(cfg.Language).LanguageName)
-	fmt.Printf("  temperature:  %.2f\n", cfg.Temperature)
-	fmt.Printf("  auto_execute: %t\n", cfg.AutoExecute)
+	fmt.Printf("  ollama_url:              %s\n", cfg.OllamaURL)
+	fmt.Printf("  model:                   %s %s\n", cfg.Model, t.DefaultModelAuto)
+	fmt.Printf("  language:                %s (%s)\n", cfg.Language, i18n.GetTranslations(cfg.Language).LanguageName)
+	fmt.Printf("  temperature:             %.2f\n", cfg.Temperature)
+	fmt.Printf("  auto_execute:            %t\n", cfg.AutoExecute)
+	fmt.Printf("  dangerous_commands:      %s\n", strings.Join(cfg.DangerousCommands, ", "))
+	fmt.Printf("  disable_dangerous_check: %t\n", cfg.DisableDangerousCheck)
 }

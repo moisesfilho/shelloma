@@ -38,7 +38,7 @@ func ConnectOrRecoverOllama(cfg config.Config, t i18n.Translations) ollama.LLMPr
 	ui.PrintCommandCard(startCmd)
 
 	for {
-		action := HandleUserAction(nil, sysinfo.SystemContext{}, &startCmd, t)
+		action := HandleUserAction(nil, sysinfo.SystemContext{}, &startCmd, cfg, t)
 		if action == ui.ActionExecute {
 			exitCode, _, _ := ui.ExecuteCommand(startCmd, t)
 			if exitCode == 0 {
@@ -64,7 +64,7 @@ func ConnectOrRecoverOllama(cfg config.Config, t i18n.Translations) ollama.LLMPr
 	}
 }
 
-func HandleUserAction(client ollama.LLMProvider, _ sysinfo.SystemContext, cmd *string, t i18n.Translations) ui.Action {
+func HandleUserAction(client ollama.LLMProvider, _ sysinfo.SystemContext, cmd *string, cfg config.Config, t i18n.Translations) ui.Action {
 	action := ui.PromptAction(t)
 	switch action {
 	case ui.ActionExecute:
@@ -85,6 +85,11 @@ func HandleUserAction(client ollama.LLMProvider, _ sysinfo.SystemContext, cmd *s
 	case ui.ActionEdit:
 		*cmd = ui.EditCommand(*cmd, t)
 		ui.PrintCommandCard(*cmd)
+		if !cfg.DisableDangerousCheck {
+			if isDanger, matched := config.CheckDangerous(*cmd, cfg.DangerousCommands); isDanger {
+				ui.PrintDangerousWarning(matched, t)
+			}
+		}
 	case ui.ActionCopy:
 		if err := ui.CopyToClipboard(*cmd, t); err != nil {
 			fmt.Printf("%s%s %v%s\n", ui.Red, t.CopyError, err, ui.Reset)
@@ -99,7 +104,16 @@ func HandleUserAction(client ollama.LLMProvider, _ sysinfo.SystemContext, cmd *s
 	return action
 }
 
-func ExecuteWithRecovery(client ollama.LLMProvider, sysCtx sysinfo.SystemContext, cmdStr string, autoExec bool, t i18n.Translations) bool {
+func ExecuteWithRecovery(client ollama.LLMProvider, sysCtx sysinfo.SystemContext, cmdStr string, cfg config.Config, t i18n.Translations) bool {
+	if !cfg.DisableDangerousCheck {
+		if isDanger, _ := config.CheckDangerous(cmdStr, cfg.DangerousCommands); isDanger {
+			if !ui.PromptSecurityWord("CONFIRM", t) {
+				fmt.Printf("%s%s%s\n", ui.Red, t.SecurityWordIncorrect, ui.Reset)
+				return false
+			}
+		}
+	}
+
 	exitCode, output, _ := ui.ExecuteCommand(cmdStr, t)
 
 	fmt.Printf("%s🔍 %s%s\r", ui.Gray, t.AnalyzingResult, ui.Reset)
@@ -134,19 +148,29 @@ func ExecuteWithRecovery(client ollama.LLMProvider, sysCtx sysinfo.SystemContext
 
 	fmt.Printf("\n%s💡 %s%s\n", ui.Cyan+ui.Bold, t.FixSuggestion, ui.Reset)
 	ui.PrintCommandCard(suggestedCmd)
+	if !cfg.DisableDangerousCheck {
+		if isDanger, matched := config.CheckDangerous(suggestedCmd, cfg.DangerousCommands); isDanger {
+			ui.PrintDangerousWarning(matched, t)
+		}
+	}
 
 	for {
-		action := HandleUserAction(client, sysCtx, &suggestedCmd, t)
+		action := HandleUserAction(client, sysCtx, &suggestedCmd, cfg, t)
 		if action == ui.ActionExecute {
-			fixSuccess := ExecuteWithRecovery(client, sysCtx, suggestedCmd, autoExec, t)
+			fixSuccess := ExecuteWithRecovery(client, sysCtx, suggestedCmd, cfg, t)
 			if fixSuccess {
 				fmt.Printf("\n%s🔄 %s%s\n", ui.Bold+ui.Cyan, t.SuccessFixReturn, ui.Reset)
 				ui.PrintCommandCard(cmdStr)
+				if !cfg.DisableDangerousCheck {
+					if isDanger, matched := config.CheckDangerous(cmdStr, cfg.DangerousCommands); isDanger {
+						ui.PrintDangerousWarning(matched, t)
+					}
+				}
 
 				for {
-					prevAction := HandleUserAction(client, sysCtx, &cmdStr, t)
+					prevAction := HandleUserAction(client, sysCtx, &cmdStr, cfg, t)
 					if prevAction == ui.ActionExecute {
-						return ExecuteWithRecovery(client, sysCtx, cmdStr, autoExec, t)
+						return ExecuteWithRecovery(client, sysCtx, cmdStr, cfg, t)
 					} else if prevAction == ui.ActionQuit {
 						return false
 					}

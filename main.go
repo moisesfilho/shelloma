@@ -74,18 +74,23 @@ func main() {
 	}
 
 	ui.PrintCommandCard(cmd)
+	if !cfg.DisableDangerousCheck {
+		if isDanger, matched := config.CheckDangerous(cmd, cfg.DangerousCommands); isDanger {
+			ui.PrintDangerousWarning(matched, t)
+		}
+	}
 
 	if cfg.AutoExecute {
-		if cli.ExecuteWithRecovery(client, sysCtx, cmd, true, t) {
+		if cli.ExecuteWithRecovery(client, sysCtx, cmd, cfg, t) {
 			os.Exit(0)
 		}
 		os.Exit(1)
 	}
 
 	for {
-		action := cli.HandleUserAction(client, sysCtx, &cmd, t)
+		action := cli.HandleUserAction(client, sysCtx, &cmd, cfg, t)
 		if action == ui.ActionExecute {
-			if cli.ExecuteWithRecovery(client, sysCtx, cmd, false, t) {
+			if cli.ExecuteWithRecovery(client, sysCtx, cmd, cfg, t) {
 				os.Exit(0)
 			}
 			os.Exit(1)

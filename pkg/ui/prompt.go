@@ -20,8 +20,10 @@ const (
 	ActionQuit
 )
 
+var StdinReader io.Reader = os.Stdin
+
 func PromptAction(t i18n.Translations) Action {
-	return PromptActionWithReader(os.Stdin, t)
+	return PromptActionWithReader(StdinReader, t)
 }
 
 func PromptActionWithReader(r io.Reader, t i18n.Translations) Action {
@@ -54,7 +56,7 @@ func EditCommand(currentCmd string, t i18n.Translations) string {
 	fmt.Printf("%s%s%s %s\n", Dim, t.CurrentCommand, Reset, currentCmd)
 	fmt.Printf("%s%s%s ", Bold, t.NewCommand, Reset)
 
-	reader := bufio.NewReader(os.Stdin)
+	reader := bufio.NewReader(StdinReader)
 	newCmd, _ := reader.ReadString('\n')
 	newCmd = strings.TrimSpace(newCmd)
 
@@ -62,4 +64,12 @@ func EditCommand(currentCmd string, t i18n.Translations) string {
 		return currentCmd
 	}
 	return newCmd
+}
+
+func PromptSecurityWord(expectedWord string, t i18n.Translations) bool {
+	fmt.Printf(t.SecurityWordPrompt, expectedWord)
+	reader := bufio.NewReader(StdinReader)
+	input, _ := reader.ReadString('\n')
+	input = strings.TrimSpace(input)
+	return input == expectedWord
 }

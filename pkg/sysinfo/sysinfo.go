@@ -10,14 +10,14 @@ import (
 
 // SystemContext guarda informações do ambiente para enviar ao prompt da LLM
 type SystemContext struct {
-	OS          string
-	DistroName  string
-	DistroVer   string
-	Shell       string
-	User        string
-	WorkingDir  string
-	IsRoot      bool
-	Arch        string
+	OS         string
+	DistroName string
+	DistroVer  string
+	Shell      string
+	User       string
+	WorkingDir string
+	IsRoot     bool
+	Arch       string
 }
 
 // GetSystemContext lê o ambiente atual do sistema

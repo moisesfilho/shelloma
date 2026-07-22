@@ -218,6 +218,28 @@ shelloma config set model qwen2.5-coder:1.5b
 shelloma models
 ```
 
+### ⚠️ Dangerous Commands Protection
+
+To prevent accidental system damage, Shelloma includes a security validation for potentially dangerous commands (e.g., `rm`, `dd`, `mkfs`, `shred`, `chmod`, `chown`).
+
+- **Alerts**: When a dangerous command is suggested, a visual warning alert is displayed immediately below the command card.
+- **Safety Word Confirmation**: If you attempt to execute a dangerous command, you will be prompted to type the security word `"CONFIRM"` (case-sensitive) to proceed. If typed incorrectly, execution is aborted.
+- **Configurable List**: The list of dangerous commands is fully editable.
+- **Disable Safety Checks**: You can bypass this validation entirely if desired.
+
+#### Configuration Commands:
+
+```bash
+# Add/change the list of dangerous commands (comma-separated list)
+shelloma config set dangerous "rm,dd,mkfs,shred,chmod,chown,fdisk"
+
+# Disable the dangerous command protection check entirely
+shelloma config set disable_dangerous_check true
+
+# Enable the check again (default)
+shelloma config set disable_dangerous_check false
+```
+
 ### Command Flags
 
 ```text
