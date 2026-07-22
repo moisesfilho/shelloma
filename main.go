@@ -8,8 +8,6 @@ import (
 	"shelloma/pkg/cli"
 	"shelloma/pkg/config"
 	"shelloma/pkg/i18n"
-	"shelloma/pkg/logger"
-	"shelloma/pkg/ollama"
 	"shelloma/pkg/sysinfo"
 	"shelloma/pkg/ui"
 )
@@ -86,8 +84,7 @@ func main() {
 	}
 
 	if cfg.AutoExecute {
-		success, ec, out := cli.ExecuteWithRecovery(client, sysCtx, cmd, cfg, t)
-		writeLog(userQuery, cmd, "Execute", ec, out, sysCtx, cfg, client)
+		success, _, _ := cli.ExecuteMultiStep(client, &sysCtx, cmd, cfg, t, userQuery)
 		if success {
 			os.Exit(0)
 		}
@@ -98,48 +95,17 @@ func main() {
 		action := cli.HandleUserAction(client, sysCtx, &cmd, cfg, t)
 		switch action {
 		case ui.ActionExecute:
-			success, ec, out := cli.ExecuteWithRecovery(client, sysCtx, cmd, cfg, t)
-			writeLog(userQuery, cmd, "Execute", ec, out, sysCtx, cfg, client)
+			success, _, _ := cli.ExecuteMultiStep(client, &sysCtx, cmd, cfg, t, userQuery)
 			if success {
 				os.Exit(0)
 			}
 			os.Exit(1)
 		case ui.ActionQuit:
-			writeLog(userQuery, cmd, "Quit", 0, "", sysCtx, cfg, client)
+			cli.LogExecution(userQuery, cmd, "Quit", 0, "", sysCtx, cfg, client)
 			os.Exit(0)
 		case ui.ActionCopy:
-			writeLog(userQuery, cmd, "Copy", 0, "", sysCtx, cfg, client)
+			cli.LogExecution(userQuery, cmd, "Copy", 0, "", sysCtx, cfg, client)
 			os.Exit(0)
 		}
 	}
-}
-
-func writeLog(userPrompt, cmdStr, action string, exitCode int, output string, sysCtx sysinfo.SystemContext, cfg config.Config, client ollama.LLMProvider) {
-	isDanger, matched := config.CheckDangerous(cmdStr, cfg.DangerousCommands)
-	dangerousAlertShown := !cfg.DisableDangerousCheck && isDanger
-
-	var modelName string
-	if client != nil {
-		modelName = client.GetModel()
-	}
-
-	entry := logger.LogEntry{
-		UserQuery:              userPrompt,
-		SuggestedCommand:       cmdStr,
-		UserAction:             action,
-		ExitCode:               exitCode,
-		CommandOutput:          output,
-		WorkingDir:             sysCtx.WorkingDir,
-		User:                   sysCtx.User,
-		OS:                     sysCtx.OS,
-		OllamaURL:              cfg.OllamaURL,
-		Model:                  modelName,
-		Temperature:            cfg.Temperature,
-		AutoExecute:            cfg.AutoExecute,
-		DangerousAlertShown:    dangerousAlertShown,
-		MatchedDangerousWord:   matched,
-		DangerousCheckBypassed: cfg.DisableDangerousCheck,
-	}
-
-	_ = logger.WriteLogEntry(entry)
 }

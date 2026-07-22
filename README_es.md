@@ -30,6 +30,7 @@
 - 🤖 **Selección Automática de Modelo**: Detecta los modelos instalados en Ollama y selecciona automáticamente el mejor modelo orientado a código y terminal disponible.
 - 💡 **Recuperación de Ollama Offline**: Detecta cuando Ollama está fuera de línea y te ofrece de forma interactiva iniciar el servicio según tu SO (`ollama serve`, `brew services start ollama`, `sudo systemctl start ollama`).
 - 📦 **Distribución Multiplataforma**: Ejecutables para Windows (`.exe`), macOS y Linux (`.deb`, `.rpm`, AppImage, Flatpak).
+- ⛓️ **Ejecución de Múltiples Etapas**: Ejecuta secuencias de comandos de múltiples etapas paso a paso con confirmaciones y registra cada etapa.
 
 ---
 
@@ -228,6 +229,15 @@ Cada sugerencia de comando y resultado de ejecución se registra automáticament
 Ejecute `shelloma logs` para abrir los registros. Puede elegir entre:
 1. Mostrar los registros en un formato estructurado limpio directamente en su terminal.
 2. Abrir el archivo de registro en el editor de texto predeterminado de su sistema.
+
+### ⛓️ Ejecución de Comandos de Múltiples Etapas
+
+Cuando una consulta del usuario requiere varios pasos de ejecución, Shelloma instruye al modelo local para estructurar los comandos como líneas de comandos separadas (un comando por línea).
+
+Características:
+- **Confirmación por Paso**: Shelloma presenta la secuencia de comandos planificada y solicita la confirmación del usuario para cada paso de forma individual.
+- **Persistencia de Navegación de Directorio**: Los comandos `cd` se interceptan y se aplican al directorio del proceso, lo que garantiza que los pasos de ejecución posteriores se ejecuten en el contexto correcto.
+- **Análisis de Errores y Registros**: Cada paso se verifica en busca de errores y se registra como una entrada de registro de ejecución individual.
 
 ### ⚠️ Protección de Comandos Peligrosos
 

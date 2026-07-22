@@ -32,7 +32,7 @@ STRICT RESPONSE RULES:
 1. Respond ONLY with the raw executable command.
 2. DO NOT use markdown code block wrappers like `+"```"+`.
 3. DO NOT add introductions, explanations, greetings, or comments.
-4. If multiple commands are needed, chain them appropriately for shell %s.
+4. If multiple commands are needed, write them as separate command lines (one command per line) so the tool can parse and execute them step-by-step with user confirmation.
 5. Adapt commands specifically for system %s / shell %s.`,
 		osPersona,
 		sysCtx.OS, sysCtx.DistroName, sysCtx.DistroVer,
@@ -40,7 +40,6 @@ STRICT RESPONSE RULES:
 		sysCtx.WorkingDir,
 		sysCtx.User, sysCtx.IsRoot,
 		sysCtx.Arch,
-		sysCtx.Shell,
 		sysCtx.DistroName, sysCtx.Shell,
 	)
 

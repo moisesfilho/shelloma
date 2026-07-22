@@ -30,6 +30,7 @@ O **Shelloma** é uma aplicação CLI nativa e ultrarrápida desenvolvida em Go 
 - 🤖 **Seleção Automática de Modelo**: Detecta os modelos instalados no Ollama e seleciona automaticamente o melhor modelo focado em código/shell disponível.
 - 💡 **Detecção e Inicialização do Ollama**: Se o serviço Ollama estiver parado, o Shelloma avisa e oferece um comando rápido interativo para iniciá-lo de acordo com seu SO (`ollama serve`, `brew services start ollama`, `sudo systemctl start ollama`).
 - 📦 **Instalação Multiplataforma**: Executáveis compilados (`.exe`, binários nativos) e pacotes Linux (`.deb`, `.rpm`, AppImage, Flatpak).
+- ⛓️ **Execução Multi Etapa**: Executa sequências de comandos multi etapa passo a passo com confirmações e gera logs para cada comando.
 
 ---
 
@@ -228,6 +229,15 @@ Toda sugestão de comando e resultado de execução é registrado automaticament
 Execute `shelloma logs` para abrir os logs. Você pode escolher:
 1. Exibir os logs em um formato limpo e estruturado diretamente no seu terminal.
 2. Abrir o arquivo de log no editor de texto padrão do seu sistema.
+
+### ⛓️ Execução de Comando Multi Etapa
+
+Quando uma instrução do usuário exige várias etapas de execução, o Shelloma instrui o modelo local a estruturar os comandos em linhas separadas (um comando por linha).
+
+Recursos:
+- **Confirmação por Etapa**: O Shelloma exibe a sequência planejada de comandos e solicita a confirmação do usuário antes de executar cada etapa individualmente.
+- **Persistência de Navegação de Diretório**: Comandos `cd` são interceptados e aplicados ao diretório do processo, garantindo que as etapas subsequentes rodem no contexto correto.
+- **Análise de Erros e Logs**: Cada etapa individual é validada contra falhas e gera sua própria entrada no histórico de logs.
 
 ### ⚠️ Proteção de Comandos Perigosos
 

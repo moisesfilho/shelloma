@@ -1,14 +1,18 @@
 package cli
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
+	"strings"
 	"time"
 
 	"shelloma/pkg/config"
 	"shelloma/pkg/i18n"
+	"shelloma/pkg/logger"
 	"shelloma/pkg/ollama"
 	"shelloma/pkg/sysinfo"
 	"shelloma/pkg/ui"
@@ -181,4 +185,133 @@ func ExecuteWithRecovery(client ollama.LLMProvider, sysCtx sysinfo.SystemContext
 			return false, exitCode, output
 		}
 	}
+}
+
+func LogExecution(userPrompt, cmdStr, action string, exitCode int, output string, sysCtx sysinfo.SystemContext, cfg config.Config, client ollama.LLMProvider) {
+	isDanger, matched := config.CheckDangerous(cmdStr, cfg.DangerousCommands)
+	dangerousAlertShown := !cfg.DisableDangerousCheck && isDanger
+
+	var modelName string
+	if client != nil {
+		modelName = client.GetModel()
+	}
+
+	entry := logger.LogEntry{
+		UserQuery:              userPrompt,
+		SuggestedCommand:       cmdStr,
+		UserAction:             action,
+		ExitCode:               exitCode,
+		CommandOutput:          output,
+		WorkingDir:             sysCtx.WorkingDir,
+		User:                   sysCtx.User,
+		OS:                     sysCtx.OS,
+		OllamaURL:              cfg.OllamaURL,
+		Model:                  modelName,
+		Temperature:            cfg.Temperature,
+		AutoExecute:            cfg.AutoExecute,
+		DangerousAlertShown:    dangerousAlertShown,
+		MatchedDangerousWord:   matched,
+		DangerousCheckBypassed: cfg.DisableDangerousCheck,
+	}
+
+	_ = logger.WriteLogEntry(entry)
+}
+
+func SplitCommandSteps(cmd string) []string {
+	var steps []string
+	for _, line := range strings.Split(cmd, "\n") {
+		trimmed := strings.TrimSpace(line)
+		if trimmed != "" {
+			steps = append(steps, trimmed)
+		}
+	}
+	return steps
+}
+
+func handleCdCommand(cmdStr string, sysCtx *sysinfo.SystemContext) error {
+	parts := strings.Fields(cmdStr)
+	target := ""
+	if len(parts) > 1 {
+		target = strings.TrimSpace(strings.TrimPrefix(cmdStr, "cd"))
+		target = strings.Trim(target, "\"'")
+	} else {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return err
+		}
+		target = home
+	}
+
+	// Expand ~
+	if strings.HasPrefix(target, "~") {
+		home, err := os.UserHomeDir()
+		if err == nil {
+			target = filepath.Join(home, target[1:])
+		}
+	}
+
+	target = os.ExpandEnv(target)
+
+	err := os.Chdir(target)
+	if err == nil {
+		if wd, getErr := os.Getwd(); getErr == nil {
+			sysCtx.WorkingDir = wd
+		}
+	}
+	return err
+}
+
+func ExecuteMultiStep(client ollama.LLMProvider, sysCtx *sysinfo.SystemContext, cmdStr string, cfg config.Config, t i18n.Translations, userQuery string) (bool, int, string) {
+	steps := SplitCommandSteps(cmdStr)
+	if len(steps) <= 1 {
+		success, ec, out := ExecuteWithRecovery(client, *sysCtx, cmdStr, cfg, t)
+		LogExecution(userQuery, cmdStr, "Execute", ec, out, *sysCtx, cfg, client)
+		return success, ec, out
+	}
+
+	fmt.Printf("\n%s⛓️  %s (%d %s)%s\n", ui.Bold+ui.Cyan, t.MultiStepHeader, len(steps), t.StepsLabel, ui.Reset)
+
+	var lastExitCode = 0
+	var lastOutput = ""
+
+	for i, step := range steps {
+		stepNum := i + 1
+		fmt.Printf("\n%s👉 [%d/%d] %s%s\n", ui.Bold+ui.Yellow, stepNum, len(steps), step, ui.Reset)
+		if !cfg.AutoExecute {
+			fmt.Printf(t.ConfirmStepPrompt, stepNum, len(steps))
+			reader := bufio.NewReader(ui.StdinReader)
+			choice, _ := reader.ReadString('\n')
+			choice = strings.TrimSpace(strings.ToLower(choice))
+			if choice != "" && choice != "y" && choice != "yes" && choice != "sim" && choice != "si" && choice != "s" {
+				fmt.Println(t.OperationCancelled)
+				return false, lastExitCode, lastOutput
+			}
+		}
+
+		if strings.HasPrefix(strings.TrimSpace(step), "cd ") || strings.TrimSpace(step) == "cd" {
+			err := handleCdCommand(strings.TrimSpace(step), sysCtx)
+			if err != nil {
+				fmt.Printf("%s%s %v%s\n", ui.Red, t.ErrorPrefix, err, ui.Reset)
+				LogExecution(userQuery, step, "Execute", 1, err.Error(), *sysCtx, cfg, client)
+				return false, 1, err.Error()
+			}
+			fmt.Printf("%s✔ %s: %s%s\n", ui.Green, t.Success, sysCtx.WorkingDir, ui.Reset)
+			LogExecution(userQuery, step, "Execute", 0, "Changed directory to "+sysCtx.WorkingDir, *sysCtx, cfg, client)
+			lastExitCode = 0
+			lastOutput = "Changed directory to " + sysCtx.WorkingDir
+			continue
+		}
+
+		success, ec, out := ExecuteWithRecovery(client, *sysCtx, step, cfg, t)
+		LogExecution(userQuery, step, "Execute", ec, out, *sysCtx, cfg, client)
+
+		lastExitCode = ec
+		lastOutput = out
+
+		if !success {
+			return false, ec, out
+		}
+	}
+
+	return true, lastExitCode, lastOutput
 }

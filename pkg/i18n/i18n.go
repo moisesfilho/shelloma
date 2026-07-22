@@ -61,6 +61,9 @@ type Translations struct {
 	LogNoLogsFound          string `json:"log_no_logs_found"`
 	LogOpeningEditor        string `json:"log_opening_editor"`
 	LogInvalidOption        string `json:"log_invalid_option"`
+	MultiStepHeader         string `json:"multi_step_header"`
+	StepsLabel              string `json:"steps_label"`
+	ConfirmStepPrompt       string `json:"confirm_step_prompt"`
 
 	// Help / Usage
 	HelpTitle       string `json:"help_title"`

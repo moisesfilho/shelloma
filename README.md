@@ -30,6 +30,7 @@
 - 🤖 **Automatic Model Selection**: Automatically detects installed Ollama models and selects the best available coding/shell model.
 - 💡 **Ollama Offline Recovery**: Detects when Ollama is offline and interactively offers to start the service based on your OS (`ollama serve`, `brew services start ollama`, `sudo systemctl start ollama`).
 - 📦 **Cross-Platform Distribution**: Binaries for Windows (`.exe`), macOS, and Linux (`.deb`, `.rpm`, AppImage, Flatpak).
+- ⛓️ **Multi-Step Command Execution**: Executes multi-step command sequences step-by-step with confirmation prompts and logs each step.
 
 ---
 
@@ -228,6 +229,15 @@ Every command suggestion and execution outcome is automatically recorded in a st
 Run `shelloma logs` to open it. You can choose to:
 1. Print the logs in a clean structured format directly in your terminal.
 2. Open the raw log file in your system's default text editor.
+
+### ⛓️ Multi-Step Command Execution
+
+When a user query requires multiple execution steps, Shelloma instructs the local model to structure the commands as separate command lines (one per line).
+
+Features:
+- **Confirmation Prompts**: Shelloma presents the planned command sequence and asks for user confirmation for each step individually.
+- **Directory Traversal Persistence**: `cd` commands are intercepted and applied to the process workspace, ensuring subsequent execution steps run in the correct context.
+- **Error Analysis & Logs**: Each step is checked for errors and recorded as an individual execution log entry.
 
 ### ⚠️ Dangerous Commands Protection
 
