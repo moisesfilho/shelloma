@@ -74,7 +74,7 @@ func TestSaveAndLoadConfig(t *testing.T) {
 }
 
 func TestCheckDangerous(t *testing.T) {
-	dangerousList := []string{"rm", "dd", "chmod"}
+	dangerousList := []string{"rm", "dd", "chmod", "Remove-Item", "del", "Format-Volume"}
 
 	tests := []struct {
 		cmd      string
@@ -89,6 +89,9 @@ func TestCheckDangerous(t *testing.T) {
 		{"echo \"chmod\"", true, "chmod"},
 		{"chmod 755 script.sh", true, "chmod"},
 		{"formated", false, ""},
+		{"Remove-Item -Path C:\\test -Recurse", true, "Remove-Item"},
+		{"del C:\\test.txt", true, "del"},
+		{"Format-Volume -DriveLetter D", true, "Format-Volume"},
 	}
 
 	for _, tt := range tests {

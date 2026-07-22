@@ -25,7 +25,7 @@ func DefaultConfig() Config {
 		Temperature:           0.1,
 		AutoExecute:           false,
 		Language:              "en", // Idioma padrão: Inglês
-		DangerousCommands:     []string{"rm", "dd", "mkfs", "shred", "chmod", "chown"},
+		DangerousCommands:     []string{"rm", "dd", "mkfs", "shred", "chmod", "chown", "Remove-Item", "del", "rd", "rmdir", "format", "Format-Volume"},
 		DisableDangerousCheck: false,
 	}
 }

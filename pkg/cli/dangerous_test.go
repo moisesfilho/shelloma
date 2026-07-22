@@ -168,3 +168,48 @@ func TestDangerousCommandFlow(t *testing.T) {
 		t.Error("Expected no safety confirmation prompt, but found one in output")
 	}
 }
+
+func TestDangerousWindowsCommandFlow(t *testing.T) {
+	oldStdinReader := ui.StdinReader
+	defer func() {
+		ui.StdinReader = oldStdinReader
+	}()
+
+	cfg := config.Config{
+		OllamaURL:             "http://localhost:11434",
+		Model:                 "mock-model",
+		Temperature:           0.1,
+		AutoExecute:           true,
+		Language:              "en",
+		DangerousCommands:     []string{"Remove-Item", "del", "Format-Volume"},
+		DisableDangerousCheck: false,
+	}
+
+	tTrans := i18n.GetTranslations("en")
+	client := &mockLLM{suggestedCmd: "Remove-Item -Path C:\\test -Recurse"}
+	sysCtx := sysinfo.SystemContext{OS: "windows"}
+
+	// Simulate incorrect security word
+	ui.StdinReader = strings.NewReader("WRONG\n")
+
+	// Capture stdout
+	oldStdout := os.Stdout
+	r, w, _ := os.Pipe()
+	os.Stdout = w
+
+	success := ExecuteWithRecovery(client, sysCtx, "Remove-Item -Path C:\\test -Recurse", cfg, tTrans)
+
+	w.Close()
+	var buf bytes.Buffer
+	_, _ = io.Copy(&buf, r)
+	os.Stdout = oldStdout
+	output := buf.String()
+
+	if success {
+		t.Error("Expected execution to fail due to incorrect security word, but it succeeded")
+	}
+
+	if !strings.Contains(output, "Incorrect security word. Execution aborted.") {
+		t.Errorf("Expected output to contain incorrect security word abort message, but got: %q", output)
+	}
+}

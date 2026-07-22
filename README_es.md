@@ -220,7 +220,7 @@ shelloma models
 
 ### ⚠️ Protección de Comandos Peligrosos
 
-Para evitar daños accidentales al sistema, Shelloma incluye una validación de seguridad para comandos potencialmente peligrosos (por ejemplo, `rm`, `dd`, `mkfs`, `shred`, `chmod`, `chown`).
+Para evitar daños accidentales al sistema, Shelloma incluye una validación de seguridad para comandos potencialmente peligrosos en Linux, macOS y Windows (por ejemplo, `rm`, `dd`, `mkfs`, `shred`, `chmod`, `chown`, `Remove-Item`, `del`, `rd`, `rmdir`, `format`, `Format-Volume`).
 
 - **Alertas**: Cuando se sugiere un comando peligroso, se muestra un aviso de advertencia visual inmediatamente debajo de la tarjeta de comando.
 - **Palabra de Seguridad**: Si intenta ejecutar un comando peligroso, se le pedirá que escriba la palabra de seguridad `"CONFIRM"` (se distinguen mayúsculas y minúsculas) para continuar. Si se escribe incorrectamente, la ejecución se cancelará.
@@ -231,7 +231,7 @@ Para evitar daños accidentales al sistema, Shelloma incluye una validación de 
 
 ```bash
 # Agregar/cambiar la lista de comandos peligrosos (lista separada por comas)
-shelloma config set dangerous "rm,dd,mkfs,shred,chmod,chown,fdisk"
+shelloma config set dangerous "rm,dd,mkfs,shred,chmod,chown,Remove-Item,del,rd,rmdir,format,Format-Volume"
 
 # Desactivar completamente la verificación de comandos peligrosos
 shelloma config set disable_dangerous_check true
