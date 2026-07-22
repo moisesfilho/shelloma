@@ -81,7 +81,7 @@ func TestDangerousCommandFlow(t *testing.T) {
 	r, w, _ := os.Pipe()
 	os.Stdout = w
 
-	success := ExecuteWithRecovery(client, sysCtx, cmdToDelete, cfg, tTrans)
+	success, _, _ := ExecuteWithRecovery(client, sysCtx, cmdToDelete, cfg, tTrans)
 
 	w.Close()
 	var buf bytes.Buffer
@@ -110,7 +110,7 @@ func TestDangerousCommandFlow(t *testing.T) {
 	r2, w2, _ := os.Pipe()
 	os.Stdout = w2
 
-	success = ExecuteWithRecovery(client, sysCtx, cmdToDelete, cfg, tTrans)
+	success, _, _ = ExecuteWithRecovery(client, sysCtx, cmdToDelete, cfg, tTrans)
 
 	w2.Close()
 	var buf2 bytes.Buffer
@@ -146,7 +146,7 @@ func TestDangerousCommandFlow(t *testing.T) {
 	r3, w3, _ := os.Pipe()
 	os.Stdout = w3
 
-	successC := ExecuteWithRecovery(client, sysCtx, cmdToDeleteC, cfg, tTrans)
+	successC, _, _ := ExecuteWithRecovery(client, sysCtx, cmdToDeleteC, cfg, tTrans)
 
 	w3.Close()
 	var buf3 bytes.Buffer
@@ -197,7 +197,7 @@ func TestDangerousWindowsCommandFlow(t *testing.T) {
 	r, w, _ := os.Pipe()
 	os.Stdout = w
 
-	success := ExecuteWithRecovery(client, sysCtx, "Remove-Item -Path C:\\test -Recurse", cfg, tTrans)
+	success, _, _ := ExecuteWithRecovery(client, sysCtx, "Remove-Item -Path C:\\test -Recurse", cfg, tTrans)
 
 	w.Close()
 	var buf bytes.Buffer

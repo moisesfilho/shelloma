@@ -57,6 +57,10 @@ type Translations struct {
 	DangerousCommandWarning string `json:"dangerous_command_warning"`
 	SecurityWordPrompt      string `json:"security_word_prompt"`
 	SecurityWordIncorrect   string `json:"security_word_incorrect"`
+	LogPromptOptions        string `json:"log_prompt_options"`
+	LogNoLogsFound          string `json:"log_no_logs_found"`
+	LogOpeningEditor        string `json:"log_opening_editor"`
+	LogInvalidOption        string `json:"log_invalid_option"`
 
 	// Help / Usage
 	HelpTitle       string `json:"help_title"`

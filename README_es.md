@@ -216,7 +216,18 @@ shelloma config set model qwen2.5-coder:1.5b
 
 # Listar los modelos de Ollama instalados
 shelloma models
+
+# Abrir los registros (logs) de ejecución de la aplicación
+shelloma logs
 ```
+
+### 📋 Registro de Ejecución (Logs)
+
+Cada sugerencia de comando y resultado de ejecución se registra automáticamente en un archivo de registro estructurado (utilizando el directorio de caché predeterminado para cada sistema operativo: `~/.cache/shelloma/shelloma.log` en Linux/macOS, o `%LocalAppData%\shelloma\shelloma.log` en Windows).
+
+Ejecute `shelloma logs` para abrir los registros. Puede elegir entre:
+1. Mostrar los registros en un formato estructurado limpio directamente en su terminal.
+2. Abrir el archivo de registro en el editor de texto predeterminado de su sistema.
 
 ### ⚠️ Protección de Comandos Peligrosos
 

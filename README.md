@@ -216,7 +216,18 @@ shelloma config set model qwen2.5-coder:1.5b
 
 # List installed Ollama models
 shelloma models
+
+# Open application execution logs
+shelloma logs
 ```
+
+### 📋 Structured Logging
+
+Every command suggestion and execution outcome is automatically recorded in a structured log file (using the standard cache directory for each operating system: `~/.cache/shelloma/shelloma.log` on Linux/macOS, or `%LocalAppData%\shelloma\shelloma.log` on Windows).
+
+Run `shelloma logs` to open it. You can choose to:
+1. Print the logs in a clean structured format directly in your terminal.
+2. Open the raw log file in your system's default text editor.
 
 ### ⚠️ Dangerous Commands Protection
 

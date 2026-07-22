@@ -95,7 +95,7 @@ func HandleUserAction(client ollama.LLMProvider, _ sysinfo.SystemContext, cmd *s
 			fmt.Printf("%s%s %v%s\n", ui.Red, t.CopyError, err, ui.Reset)
 		} else {
 			fmt.Printf("%s✔ %s%s\n", ui.Green, t.CopiedToClipboard, ui.Reset)
-			return ui.ActionQuit
+			return ui.ActionCopy
 		}
 	case ui.ActionQuit:
 		fmt.Println(t.OperationCancelled)
@@ -104,12 +104,12 @@ func HandleUserAction(client ollama.LLMProvider, _ sysinfo.SystemContext, cmd *s
 	return action
 }
 
-func ExecuteWithRecovery(client ollama.LLMProvider, sysCtx sysinfo.SystemContext, cmdStr string, cfg config.Config, t i18n.Translations) bool {
+func ExecuteWithRecovery(client ollama.LLMProvider, sysCtx sysinfo.SystemContext, cmdStr string, cfg config.Config, t i18n.Translations) (bool, int, string) {
 	if !cfg.DisableDangerousCheck {
 		if isDanger, _ := config.CheckDangerous(cmdStr, cfg.DangerousCommands); isDanger {
 			if !ui.PromptSecurityWord("CONFIRM", t) {
 				fmt.Printf("%s%s%s\n", ui.Red, t.SecurityWordIncorrect, ui.Reset)
-				return false
+				return false, 0, ""
 			}
 		}
 	}
@@ -117,15 +117,15 @@ func ExecuteWithRecovery(client ollama.LLMProvider, sysCtx sysinfo.SystemContext
 	exitCode, output, _ := ui.ExecuteCommand(cmdStr, t)
 
 	fmt.Printf("%s🔍 %s%s\r", ui.Gray, t.AnalyzingResult, ui.Reset)
-	analysis, err := client.AnalyzeExecutionResult(cmdStr, exitCode, output, sysCtx)
+	analysis, errResult := client.AnalyzeExecutionResult(cmdStr, exitCode, output, sysCtx)
 	fmt.Print("                                                                      \r")
 
-	if err == nil && analysis.Success {
+	if errResult == nil && analysis.Success {
 		fmt.Printf("%s✔ %s%s\n", ui.Green+ui.Bold, t.Success, ui.Reset)
 		if analysis.Reason != "" && analysis.Reason != t.Success && analysis.Reason != "Comando executado com sucesso" && analysis.Reason != "Completed successfully" && analysis.Reason != "Completado con éxito" {
 			fmt.Printf("%s%s%s\n", ui.Gray, analysis.Reason, ui.Reset)
 		}
-		return true
+		return true, exitCode, output
 	}
 
 	fmt.Printf("%s✖ %s%s\n", ui.Red+ui.Bold, t.Failed, ui.Reset)
@@ -157,7 +157,7 @@ func ExecuteWithRecovery(client ollama.LLMProvider, sysCtx sysinfo.SystemContext
 	for {
 		action := HandleUserAction(client, sysCtx, &suggestedCmd, cfg, t)
 		if action == ui.ActionExecute {
-			fixSuccess := ExecuteWithRecovery(client, sysCtx, suggestedCmd, cfg, t)
+			fixSuccess, fixExitCode, fixOutput := ExecuteWithRecovery(client, sysCtx, suggestedCmd, cfg, t)
 			if fixSuccess {
 				fmt.Printf("\n%s🔄 %s%s\n", ui.Bold+ui.Cyan, t.SuccessFixReturn, ui.Reset)
 				ui.PrintCommandCard(cmdStr)
@@ -172,13 +172,13 @@ func ExecuteWithRecovery(client ollama.LLMProvider, sysCtx sysinfo.SystemContext
 					if prevAction == ui.ActionExecute {
 						return ExecuteWithRecovery(client, sysCtx, cmdStr, cfg, t)
 					} else if prevAction == ui.ActionQuit {
-						return false
+						return false, fixExitCode, fixOutput
 					}
 				}
 			}
-			return false
+			return false, fixExitCode, fixOutput
 		} else if action == ui.ActionQuit {
-			return false
+			return false, exitCode, output
 		}
 	}
 }
