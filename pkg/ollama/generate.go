@@ -43,6 +43,13 @@ STRICT RESPONSE RULES:
 		sysCtx.DistroName, sysCtx.Shell,
 	)
 
+	if len(c.Rules) > 0 {
+		systemPrompt += "\n\nCustom User Preferences / Rules:\n"
+		for _, rule := range c.Rules {
+			systemPrompt += fmt.Sprintf("- %s\n", rule)
+		}
+	}
+
 	reqBody := GenerateRequest{
 		Model:  c.Model,
 		Prompt: userPrompt,

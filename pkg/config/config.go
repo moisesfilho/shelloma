@@ -16,6 +16,7 @@ type Config struct {
 	Language              string   `json:"language"`
 	DangerousCommands     []string `json:"dangerous_commands"`
 	DisableDangerousCheck bool     `json:"disable_dangerous_check"`
+	Rules                 []string `json:"rules"`
 }
 
 func DefaultConfig() Config {
@@ -27,6 +28,7 @@ func DefaultConfig() Config {
 		Language:              "en", // Idioma padrão: Inglês
 		DangerousCommands:     []string{"rm", "dd", "mkfs", "shred", "chmod", "chown", "Remove-Item", "del", "rd", "rmdir", "format", "Format-Volume"},
 		DisableDangerousCheck: false,
+		Rules:                 []string{},
 	}
 }
 
@@ -68,6 +70,9 @@ func LoadConfig() (Config, error) {
 					cfg.DangerousCommands = sysCfg.DangerousCommands
 				}
 				cfg.DisableDangerousCheck = sysCfg.DisableDangerousCheck
+				if len(sysCfg.Rules) > 0 {
+					cfg.Rules = sysCfg.Rules
+				}
 			}
 		}
 	}
@@ -96,6 +101,9 @@ func LoadConfig() (Config, error) {
 					cfg.DangerousCommands = userCfg.DangerousCommands
 				}
 				cfg.DisableDangerousCheck = userCfg.DisableDangerousCheck
+				if len(userCfg.Rules) > 0 {
+					cfg.Rules = userCfg.Rules
+				}
 			}
 		} else if os.IsNotExist(err) {
 			// Se o arquivo do usuário ainda não existir, salva mesclando com /etc/shelloma/config.json

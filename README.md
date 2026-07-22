@@ -222,6 +222,25 @@ shelloma models
 shelloma logs
 ```
 
+### 📝 Custom Translation Rules
+
+You can define custom formatting and execution preferences that will be injected directly into the Ollama system prompt to guide command generation (e.g. setting default folders, choosing specific CLI text editors or programs to open specific file extensions, etc.).
+
+Commands:
+```bash
+# Add a new custom rule
+shelloma rules add "Always open images with xdg-open"
+
+# List all saved rules
+shelloma rules list
+
+# Edit a saved rule by index
+shelloma rules edit 1 "Always open images with feh"
+
+# Delete a saved rule by index
+shelloma rules delete 1
+```
+
 ### 📋 Structured Logging
 
 Every command suggestion and execution outcome is automatically recorded in a structured log file (using the standard cache directory for each operating system: `~/.cache/shelloma/shelloma.log` on Linux/macOS, or `%LocalAppData%\shelloma\shelloma.log` on Windows).

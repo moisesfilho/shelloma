@@ -54,6 +54,9 @@ func main() {
 		case "logs":
 			cli.HandleLogsCommand(cfg, t)
 			return
+		case "rules":
+			cli.HandleRulesCommand(cfg, args[1:], t)
+			return
 		}
 	}
 

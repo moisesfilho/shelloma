@@ -26,6 +26,7 @@ type Client struct {
 	Model      string
 	HTTPClient *http.Client
 	Trans      i18n.Translations
+	Rules      []string
 }
 
 type ModelInfo struct {
@@ -61,6 +62,7 @@ func NewClient(cfg config.Config) (LLMProvider, error) {
 		BaseURL: strings.TrimRight(cfg.OllamaURL, "/"),
 		Model:   cfg.Model,
 		Trans:   i18n.GetTranslations(cfg.Language),
+		Rules:   cfg.Rules,
 		HTTPClient: &http.Client{
 			Timeout: 60 * time.Second,
 		},

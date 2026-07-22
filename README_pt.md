@@ -222,6 +222,25 @@ shelloma models
 shelloma logs
 ```
 
+### 📝 Regras Customizadas do Provedor (Rules)
+
+Você pode definir regras de formatação e preferências de execução personalizadas que serão injetadas diretamente no prompt de sistema do Ollama para orientar a geração de comandos (como definir pastas padrão, escolher editores de texto CLI ou programas específicos para abrir determinadas extensões de arquivos).
+
+Comandos:
+```bash
+# Adicionar uma nova regra customizada
+shelloma rules add "Sempre abrir imagens com xdg-open"
+
+# Listar todas as regras salvas
+shelloma rules list
+
+# Editar uma regra salva pelo índice
+shelloma rules edit 1 "Sempre abrir imagens com feh"
+
+# Excluir uma regra salva pelo índice
+shelloma rules delete 1
+```
+
 ### 📋 Histórico de Execução (Logs)
 
 Toda sugestão de comando e resultado de execução é registrado automaticamente em um arquivo de log estruturado (utilizando o diretório de cache padrão de cada sistema operacional: `~/.cache/shelloma/shelloma.log` no Linux/macOS, ou `%LocalAppData%\shelloma\shelloma.log` no Windows).

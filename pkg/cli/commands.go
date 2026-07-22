@@ -1,12 +1,12 @@
 package cli
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
 	"runtime"
+	"strconv"
 	"strings"
 
 	"shelloma/pkg/config"
@@ -94,9 +94,7 @@ func HandleLogsCommand(_ config.Config, t i18n.Translations) {
 	}
 
 	fmt.Print(t.LogPromptOptions)
-	reader := bufio.NewReader(ui.StdinReader)
-	choice, _ := reader.ReadString('\n')
-	choice = strings.TrimSpace(choice)
+	choice := readLine()
 
 	switch choice {
 	case "1":
@@ -187,4 +185,158 @@ func openLogFileInEditor(logPath string) {
 	if cmd != nil {
 		_ = cmd.Start()
 	}
+}
+
+func HandleRulesCommand(cfg config.Config, args []string, t i18n.Translations) {
+	if len(args) == 0 {
+		listRules(cfg, t)
+		return
+	}
+
+	subCmd := strings.ToLower(args[0])
+	switch subCmd {
+	case "add":
+		addRule(&cfg, args[1:], t)
+	case "list":
+		listRules(cfg, t)
+	case "edit":
+		editRule(&cfg, args[1:], t)
+	case "delete", "remove":
+		deleteRule(&cfg, args[1:], t)
+	default:
+		fmt.Printf("%sInvalid rules subcommand: %s. Use: add, list, edit, delete.%s\n", ui.Red, subCmd, ui.Reset)
+	}
+}
+
+func listRules(cfg config.Config, t i18n.Translations) {
+	if len(cfg.Rules) == 0 {
+		fmt.Println(t.NoRulesFound)
+		return
+	}
+	fmt.Printf("%s%s%s\n", ui.Bold+ui.Cyan, t.RulesHeader, ui.Reset)
+	for i, r := range cfg.Rules {
+		fmt.Printf(" %d. %s\n", i+1, r)
+	}
+}
+
+func addRule(cfg *config.Config, args []string, t i18n.Translations) {
+	ruleText := ""
+	if len(args) > 0 {
+		ruleText = strings.Join(args, " ")
+	} else {
+		fmt.Print(t.EnterRulePrompt + ": ")
+		ruleText = readLine()
+	}
+
+	if ruleText == "" {
+		return
+	}
+
+	cfg.Rules = append(cfg.Rules, ruleText)
+	if err := config.SaveConfig(*cfg); err != nil {
+		fmt.Printf("%s%s %v%s\n", ui.Red, t.ErrorPrefix, err, ui.Reset)
+		os.Exit(1)
+	}
+	fmt.Printf("%s✔ %s%s\n", ui.Green, t.RuleAdded, ui.Reset)
+}
+
+func editRule(cfg *config.Config, args []string, t i18n.Translations) {
+	if len(cfg.Rules) == 0 {
+		fmt.Println(t.NoRulesFound)
+		return
+	}
+
+	var index = -1
+	var ruleText string
+
+	if len(args) > 0 {
+		idx, err := strconv.Atoi(args[0])
+		if err == nil && idx > 0 && idx <= len(cfg.Rules) {
+			index = idx - 1
+			if len(args) > 1 {
+				ruleText = strings.Join(args[1:], " ")
+			}
+		}
+	}
+
+	if index < 0 || index >= len(cfg.Rules) {
+		listRules(*cfg, t)
+		fmt.Print(t.EnterIndexPrompt)
+		input := readLine()
+		idx, err := strconv.Atoi(input)
+		if err != nil || idx <= 0 || idx > len(cfg.Rules) {
+			fmt.Printf("%s%s%s\n", ui.Red, t.InvalidIndex, ui.Reset)
+			return
+		}
+		index = idx - 1
+	}
+
+	if ruleText == "" {
+		fmt.Printf("%s [%d]: ", t.EnterRulePrompt, index+1)
+		ruleText = readLine()
+	}
+
+	if ruleText == "" {
+		return
+	}
+
+	cfg.Rules[index] = ruleText
+	if err := config.SaveConfig(*cfg); err != nil {
+		fmt.Printf("%s%s %v%s\n", ui.Red, t.ErrorPrefix, err, ui.Reset)
+		os.Exit(1)
+	}
+	fmt.Printf("%s✔ %s%s\n", ui.Green, t.RuleEdited, ui.Reset)
+}
+
+func deleteRule(cfg *config.Config, args []string, t i18n.Translations) {
+	if len(cfg.Rules) == 0 {
+		fmt.Println(t.NoRulesFound)
+		return
+	}
+
+	var index = -1
+
+	if len(args) > 0 {
+		idx, err := strconv.Atoi(args[0])
+		if err == nil && idx > 0 && idx <= len(cfg.Rules) {
+			index = idx - 1
+		}
+	}
+
+	if index < 0 || index >= len(cfg.Rules) {
+		listRules(*cfg, t)
+		fmt.Print(t.EnterIndexPrompt)
+		input := readLine()
+		idx, err := strconv.Atoi(input)
+		if err != nil || idx <= 0 || idx > len(cfg.Rules) {
+			fmt.Printf("%s%s%s\n", ui.Red, t.InvalidIndex, ui.Reset)
+			return
+		}
+		index = idx - 1
+	}
+
+	cfg.Rules = append(cfg.Rules[:index], cfg.Rules[index+1:]...)
+	if err := config.SaveConfig(*cfg); err != nil {
+		fmt.Printf("%s%s %v%s\n", ui.Red, t.ErrorPrefix, err, ui.Reset)
+		os.Exit(1)
+	}
+	fmt.Printf("%s✔ %s%s\n", ui.Green, t.RuleDeleted, ui.Reset)
+}
+
+func readLine() string {
+	var buf []byte
+	b := make([]byte, 1)
+	for {
+		n, err := ui.StdinReader.Read(b)
+		if n > 0 {
+			if b[0] == '\n' {
+				break
+			}
+			buf = append(buf, b[0])
+		}
+		if err != nil {
+			break
+		}
+	}
+	return strings.TrimSpace(string(buf))
 }

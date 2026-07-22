@@ -222,6 +222,25 @@ shelloma models
 shelloma logs
 ```
 
+### 📝 Reglas de Traducción Personalizadas (Rules)
+
+Puede definir reglas de formato y preferencias de ejecución personalizadas que se inyectarán directamente en el prompt del sistema de Ollama para guiar la generación de comandos (como configurar carpetas predeterminadas, elegir editores de texto CLI o programas específicos para abrir extensiones de archivos particulares).
+
+Comandos:
+```bash
+# Agregar una nueva regla personalizada
+shelloma rules add "Siempre abrir imágenes con xdg-open"
+
+# Listar todas las reglas guardadas
+shelloma rules list
+
+# Editar una regla guardada por índice
+shelloma rules edit 1 "Siempre abrir imágenes con feh"
+
+# Eliminar una regla guardada por índice
+shelloma rules delete 1
+```
+
 ### 📋 Registro de Ejecución (Logs)
 
 Cada sugerencia de comando y resultado de ejecución se registra automáticamente en un archivo de registro estructurado (utilizando el directorio de caché predeterminado para cada sistema operativo: `~/.cache/shelloma/shelloma.log` en Linux/macOS, o `%LocalAppData%\shelloma\shelloma.log` en Windows).

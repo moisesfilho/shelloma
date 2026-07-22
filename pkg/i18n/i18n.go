@@ -64,6 +64,14 @@ type Translations struct {
 	MultiStepHeader         string `json:"multi_step_header"`
 	StepsLabel              string `json:"steps_label"`
 	ConfirmStepPrompt       string `json:"confirm_step_prompt"`
+	RulesHeader             string `json:"rules_header"`
+	NoRulesFound            string `json:"no_rules_found"`
+	RuleAdded               string `json:"rule_added"`
+	RuleEdited              string `json:"rule_edited"`
+	RuleDeleted             string `json:"rule_deleted"`
+	EnterRulePrompt         string `json:"enter_rule_prompt"`
+	EnterIndexPrompt        string `json:"enter_index_prompt"`
+	InvalidIndex            string `json:"invalid_index"`
 
 	// Help / Usage
 	HelpTitle       string `json:"help_title"`
