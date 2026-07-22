@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-VERSION="1.1.0"
+VERSION="1.2.0"
 ARCH="amd64"
 PKG_NAME="shelloma_${VERSION}_${ARCH}"
 BUILD_DIR="build/deb/${PKG_NAME}"

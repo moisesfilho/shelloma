@@ -114,13 +114,13 @@ Visita **[GitHub Releases](https://github.com/moisesfilho/shelloma/releases)** y
 #### 🐧 Linux
 - **Debian / Ubuntu / Linux Mint / Pop!_OS (`.deb`)**:
   ```bash
-  sudo dpkg -i shelloma_1.1.0_amd64.deb
+  sudo dpkg -i shelloma_1.2.0_amd64.deb
   ```
   *(Durante la instalación del paquete `.deb`, se mostrará un asistente interactivo para elegir el idioma).*
 
 - **Fedora / RedHat / CentOS / RHEL (`.rpm`)**:
   ```bash
-  sudo rpm -i shelloma_1.1.0_amd64.rpm
+  sudo rpm -i shelloma_1.2.0_amd64.rpm
   ```
 
 - **Flatpak (Universal)**:
@@ -139,17 +139,17 @@ Visita **[GitHub Releases](https://github.com/moisesfilho/shelloma/releases)** y
 
 #### 🍏 macOS
 - **Binario Nativo (Intel y Apple Silicon M1/M2/M3)**:
-  1. Descarga `shelloma_1.1.0_darwin_arm64.tar.gz` (Apple Silicon) o `shelloma_1.1.0_darwin_amd64.tar.gz` (Intel) en Releases.
+  1. Descarga `shelloma_1.2.0_darwin_arm64.tar.gz` (Apple Silicon) o `shelloma_1.2.0_darwin_amd64.tar.gz` (Intel) en Releases.
   2. Extrae el paquete y hazlo ejecutable:
      ```bash
-     tar -xzf shelloma_1.1.0_darwin_arm64.tar.gz
+     tar -xzf shelloma_1.2.0_darwin_arm64.tar.gz
      chmod +x shelloma
      sudo mv shelloma /usr/local/bin/
      ```
 
 #### 🪟 Windows
 - **Ejecutable Nativo (`.exe` / `.zip`)**:
-  1. Descarga `shelloma_1.1.0_windows_amd64.zip` (64-bit) o `shelloma_1.1.0_windows_arm64.zip` (ARM64) desde Releases.
+  1. Descarga `shelloma_1.2.0_windows_amd64.zip` (64-bit) o `shelloma_1.2.0_windows_arm64.zip` (ARM64) desde Releases.
   2. Extrae el archivo zip.
   3. Mueve `shelloma.exe` a una carpeta de tu sistema (ej: `C:\Program Files\Shelloma` o `C:\Tools\`).
   4. *(Opcional)* Añade la ruta del directorio a las Variables de Entorno del sistema (`PATH`) para ejecutar `shelloma` directamente desde cualquier PowerShell o Símbolo del sistema (CMD).
