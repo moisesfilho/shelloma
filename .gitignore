@@ -17,3 +17,4 @@ dist/
 # Temporários
 *.tmp
 *.log
+test_output.txt
