@@ -1,7 +1,7 @@
 .PHONY: all build build-all build-linux build-darwin build-windows deb tar appimage flatpak install-user test clean help release-snapshot
 
 BINARY_NAME=shelloma
-VERSION=1.2.1
+VERSION=1.2.2
 
 all: build
 
@@ -29,8 +29,8 @@ build-darwin:
 build-windows:
 	@echo "🔨 Compilando binários nativos Windows (amd64 e arm64)..."
 	@mkdir -p dist
-	GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o dist/$(BINARY_NAME)_windows_amd64.exe .
-	GOOS=windows GOARCH=arm64 go build -ldflags="-s -w" -o dist/$(BINARY_NAME)_windows_arm64.exe .
+	GOOS=windows GOARCH=amd64 go build -o dist/$(BINARY_NAME)_windows_amd64.exe .
+	GOOS=windows GOARCH=arm64 go build -o dist/$(BINARY_NAME)_windows_arm64.exe .
 	@echo "✔ Binários Windows gerados em ./dist/"
 
 test:

@@ -14,7 +14,6 @@ builds:
     goos:
       - linux
       - darwin
-      - windows
     goarch:
       - amd64
       - arm64
@@ -24,6 +23,19 @@ builds:
       - -trimpath
     ldflags:
       - -s -w
+
+  - id: shelloma-windows
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    main: .
+    binary: shelloma
+    flags:
+      - -trimpath
 
 archives:
   - id: default
