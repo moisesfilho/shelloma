@@ -12,7 +12,7 @@ import (
 	"shelloma/pkg/ui"
 )
 
-const version = "1.2.0"
+const version = "1.2.1"
 
 func main() {
 	cfg, err := config.LoadConfig()

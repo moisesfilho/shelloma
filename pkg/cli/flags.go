@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"os"
@@ -83,7 +84,7 @@ func GetOrPromptUserQuery(args []string, ver string, t i18n.Translations) string
 }
 
 func readLineFromStdin() (string, error) {
-	var line string
-	_, err := fmt.Scanln(&line)
-	return line, err
+	reader := bufio.NewReader(os.Stdin)
+	line, err := reader.ReadString('\n')
+	return strings.TrimSpace(line), err
 }
