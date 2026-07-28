@@ -65,5 +65,5 @@ func TestSetupFlags(t *testing.T) {
 	var modelFlag, urlFlag, langFlag string
 	var yesFlag, verFlag, desktopFlag bool
 	trans := i18n.GetTranslations("en")
-	SetupFlags(&modelFlag, &urlFlag, &langFlag, &yesFlag, &verFlag, &desktopFlag, trans, "1.2.2")
+	SetupFlags(&modelFlag, &urlFlag, &langFlag, &yesFlag, &verFlag, &desktopFlag, trans, "1.3.0")
 }

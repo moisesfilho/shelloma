@@ -2,7 +2,8 @@
 
 > **Traductor de Lenguaje Natural a Comandos Terminal para Linux, macOS y Windows impulsado por Ollama local.**
 
-[![Go Version](https://img.shields.io/badge/Go-1.20%2B-00ADD8?style=flat&logo=go)](https://golang.org)
+[![Go Version](https://img.shields.io/badge/Go-1.23%2B-00ADD8?style=flat&logo=go)](https://golang.org)
+[![CI](https://github.com/moisesfilho/shelloma/actions/workflows/ci.yml/badge.svg)](https://github.com/moisesfilho/shelloma/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS%20%7C%20Windows-blue)](https://github.com/moisesfilho/shelloma)
 [![Ollama](https://img.shields.io/badge/LLM-Ollama-black?logo=ollama)](https://ollama.com)
@@ -31,9 +32,13 @@
 - 💡 **Recuperación de Ollama Offline**: Detecta cuando Ollama está fuera de línea y te ofrece de forma interactiva iniciar el servicio según tu SO.
 - 🖥️ **Interfaz Adaptativa con Pie de Página Fijo**: Solo el pie de página con la leyenda de atajos permanece fijo en la base del terminal, sin interferir con el desplazamiento natural de la zona de entrada y del encabezado.
 - 🔄 **Refinamento Interactivo de Comandos**: Permite ajustar el comando sugerido seleccionando `[r: Refinar]`, abriendo un prompt interactivo para proporcionar comentarios o ajustes adicionales.
-- 🧭 **Historial Interactivo con Flechas**: Todos los prompts de entrada interactivos utilizan un lector raw de terminal que habilita la navegación por el historial con flechas `Arriba`/`Abajo` y el movimiento del cursor con flechas `Izquierda`/`Derecha`.
-- 📦 **Distribución Multiplataforma**: Ejecutables para Windows (`.exe`), macOS y Linux (`.deb`, `.rpm`, AppImage, Flatpak). Incluye integración nativa con el escritorio Linux (generando un lanzador `.desktop` y registrando el icono oficial en formato SVG).
+- 🧭 **Historial Interactivo con Persistencia**: Todos los prompts de entrada interactivos utilizan un lector raw de terminal que habilita la navegación por el historial con flechas `Arriba`/`Abajo` y el movimiento del cursor con flechas `Izquierda`/`Derecha`. El historial persiste entre sesiones (hasta 1000 entradas).
+- 🖥️ **Modo Terminal Desktop**: Ejecute con la bandera `--desktop` para mantener la terminal abierta tras la ejecución ("Presione Enter para salir..."). Ideal para lanzadores e integración con archivos `.desktop`.
+- ♾️ **Bucle Continuo de Comandos**: Tras una ejecución exitosa, Shelloma pregunta si desea ejecutar otra instrucción, permitiendo un flujo continuo sin reiniciar.
+- ⌨️ **Atajos de Teclado Avanzados**: El menú interactivo soporta múltiples alias por acción (ej: `y`/`sim`/`yes` para ejecutar, `e`/`ex`/`explain` para explicar), además de `Esc` para salir de cualquier prompt.
+- 📦 **Distribución Multiplataforma**: Ejecutables para Windows (`.exe`), macOS y Linux (`.deb`, `.rpm`, Snap, AppImage, Flatpak). Incluye integración nativa con el escritorio Linux (generando un lanzador `.desktop` y registrando el icono oficial en formato SVG).
 - ⛓️ **Ejecución de Múltiples Etapas**: Ejecuta secuencias de comandos de múltiples etapas paso a paso con confirmaciones y registra cada etapa.
+- 📝 **Completion de Bash**: Scripts de autocompletado para shell incluidos en paquetes Debian/Ubuntu.
 
 ---
 
@@ -41,7 +46,7 @@
 
 1. **Sistema Operativo**: Linux, macOS o Windows.
 2. **Ollama**: Servicio de Ollama instalado y activo localmente.
-3. **Go 1.20+** *(opcional)*: Solo necesario si deseas compilar la aplicación desde el código fuente.
+3. **Go 1.23+** *(opcional)*: Solo necesario si deseas compilar la aplicación desde el código fuente.
 
 ---
 
@@ -108,7 +113,7 @@ Para obtener la mejor generación de comandos de terminal, recomendamos modelos 
 
 ## 📦 Guía de Instalación y Descargas
 
-Los binarios y paquetes precompilados de Shelloma están disponibles para su descarga en la página oficial de **[GitHub Releases](https://github.com/moisesfilho/shelloma/releases)** (`.deb`, `.rpm`, `.tar.gz`, `.zip`, `AppImage`, `.flatpak`, `.exe`).
+Los binarios y paquetes precompilados de Shelloma están disponibles para su descarga en la página oficial de **[GitHub Releases](https://github.com/moisesfilho/shelloma/releases)** (`.deb`, `.rpm`, `.tar.gz`, `.zip`, `.AppImage`, `.flatpak`, Snap, `.exe`).
 
 ### Opción 1: Descarga de Paquetes Precompilados (Recomendado)
 
@@ -117,19 +122,25 @@ Visita **[GitHub Releases](https://github.com/moisesfilho/shelloma/releases)** y
 #### 🐧 Linux
 - **Debian / Ubuntu / Linux Mint / Pop!_OS (`.deb`)**:
   ```bash
-  sudo dpkg -i shelloma_1.2.1_amd64.deb
+  sudo dpkg -i shelloma_1.3.0_amd64.deb
   ```
   *(Durante la instalación del paquete `.deb`, se mostrará un asistente interactivo para elegir el idioma).*
 
 - **Fedora / RedHat / CentOS / RHEL (`.rpm`)**:
   ```bash
-  sudo rpm -i shelloma_1.2.1_amd64.rpm
+  sudo rpm -i shelloma_1.3.0_amd64.rpm
   ```
 
 - **Flatpak (Universal)**:
   ```bash
   flatpak install Shelloma-x86_64.flatpak
   ```
+
+- **Snap (Universal)**:
+  ```bash
+  snap install shelloma
+  ```
+  *(O descargue `Shelloma-x86_64.snap` desde Releases e instale con `snap install --dangerous Shelloma-x86_64.snap`)*
 
 - **AppImage (Universal - Binario portátil sin necesidad de instalación)**:
   ```bash
@@ -142,17 +153,17 @@ Visita **[GitHub Releases](https://github.com/moisesfilho/shelloma/releases)** y
 
 #### 🍏 macOS
 - **Binario Nativo (Intel y Apple Silicon M1/M2/M3)**:
-  1. Descarga `shelloma_1.2.1_darwin_arm64.tar.gz` (Apple Silicon) o `shelloma_1.2.1_darwin_amd64.tar.gz` (Intel) en Releases.
+  1. Descarga `shelloma_1.3.0_darwin_arm64.tar.gz` (Apple Silicon) o `shelloma_1.3.0_darwin_amd64.tar.gz` (Intel) en Releases.
   2. Extrae el paquete y hazlo ejecutable:
      ```bash
-     tar -xzf shelloma_1.2.1_darwin_arm64.tar.gz
+     tar -xzf shelloma_1.3.0_darwin_arm64.tar.gz
      chmod +x shelloma
      sudo mv shelloma /usr/local/bin/
      ```
 
 #### 🪟 Windows
 - **Ejecutable Nativo (`.exe` / `.zip`)**:
-  1. Descarga `shelloma_1.2.1_windows_amd64.zip` (64-bit) o `shelloma_1.2.1_windows_arm64.zip` (ARM64) desde Releases.
+  1. Descarga `shelloma_1.3.0_windows_amd64.zip` (64-bit) o `shelloma_1.3.0_windows_arm64.zip` (ARM64) desde Releases.
   2. Extrae el archivo zip.
   3. Mueve `shelloma.exe` a una carpeta de tu sistema (ej: `C:\Program Files\Shelloma` o `C:\Tools\`).
   4. *(Opcional)* Añade la ruta del directorio a las Variables de Entorno del sistema (`PATH`) para ejecutar `shelloma` directamente desde cualquier PowerShell o Símbolo del sistema (CMD).
@@ -204,6 +215,7 @@ Opciones: [Enter/y: Ejecutar] [e: Explicar] [m: Modificar] [c: Copiar] [p: Nuevo
 - **Escribir `r`**: Refina el comando sugerido abriendo un prompt interactivo para proporcionar comentarios o ajustes adicionales para que el LLM genere una nueva sugerencia revisada.
 - **Escribir `a`**: Permite reajustar/editar el prompt textual original que originó la sugerencia del comando.
 - **Escribir `q` o `n`**: Cancela la operación y sale de forma segura.
+- **Presione `Esc`**: Sale inmediatamente de cualquier prompt o menú interactivo.
 
 ### Configuración y Utilidades
 
@@ -289,9 +301,12 @@ Opciones:
   -l, --lang string    Idioma: en, pt, es (predeterminado: en)
   -m, --model string   Modelo Ollama a utilizar (ej: qwen2.5-coder:1.5b)
   -url string          URL de la API de Ollama (predeterminado: http://localhost:11434)
-  -y, --yes            Ejecutar el comando generado automáticamente sin meú
+  -y, --yes            Ejecutar el comando generado automáticamente sin menú
+      --desktop        Modo terminal desktop (pausa con "Presione Enter para salir...")
   -v, --version        Mostrar la versión de Shelloma
 ```
+
+> **Modo Desktop**: Al iniciar mediante un archivo `.desktop` o lanzador gráfico, use `--desktop` para mantener la terminal abierta tras la ejecución — útil para ver la salida antes de que la ventana se cierre.
 
 ---
 
@@ -315,11 +330,28 @@ make test
 # Ejecutar análisis estático de código (golangci-lint / staticcheck / go vet)
 make lint
 
-# Compilar binario local (ejecuta lint y test automáticamente antes de compilar)
+# Generar iconos de la aplicación (requiere Python + Pillow)
+make icons
+
+# Compilar binario local (ejecuta lint, test e icons automáticamente antes de compilar)
 make build
+
+# Compilar para todas las plataformas (Linux, macOS, Windows — amd64 + arm64)
+make build-all
+
+# Generar paquetes .deb, .tar.gz, .AppImage o .flatpak
+make deb
+make tar
+make appimage
+make flatpak
+
+# Instalar binario + .desktop + iconos en ~/.local/bin/
+make install-user
 ```
 
-El proyecto incluye integración con **`golangci-lint`** y un **Git Pre-Commit Hook** (`.git/hooks/pre-commit`) que ejecuta automáticamente la verificación estática de código y las pruebas unitarias en cada commit y compilación.
+El proyecto incluye integración con **`golangci-lint`**, un **Git Pre-Commit Hook** (`.git/hooks/pre-commit`) y un **pipeline CI/CD** mediante GitHub Actions:
+- **CI Quality Gate** (`.github/workflows/ci.yml`): Ejecuta lint + test en push/PR a `main` y `develop`.
+- **Release Pipeline** (`.github/workflows/release.yml`): Al enviar un tag, ejecuta lint + test y publica todos los paquetes (`.deb`, `.rpm`, `.tar.gz`, `.zip`, `.AppImage`, `.flatpak`, Snap) en GitHub Releases.
 
 ---
 
