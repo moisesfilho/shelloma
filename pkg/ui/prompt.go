@@ -427,13 +427,13 @@ func SetupTerminal(sysCtx sysinfo.SystemContext, model string, version string, t
 	fmt.Printf("%s┌%s┐%s\n", Gray, strings.Repeat("─", cols-2), Reset)
 
 	lines := []string{
-		fmt.Sprintf("      /\\                 %sSHELLOMA - CLI ASSISTANT%s", Bold+Cyan, Reset),
-		"     /  \\                ------------------------",
-		fmt.Sprintf("    / /\\ \\               %s: v%s", t.HeaderVersion, version),
-		fmt.Sprintf("   ( (  ) )              %s: %s", t.HeaderDirectory, sysCtx.WorkingDir),
-		fmt.Sprintf("    \\ \\/ /               %s: %s (%s)", t.HeaderOS, sysCtx.OS, sysCtx.DistroName),
-		fmt.Sprintf("     \\__/                %s: %s", t.HeaderShell, sysCtx.Shell),
-		fmt.Sprintf("                         %s: %s", t.HeaderModel, model),
+		fmt.Sprintf("      .-''-.               %sSHELLOMA - CLI ASSISTANT%s", Bold+Cyan, Reset),
+		"     /   @   \\              ------------------------",
+		fmt.Sprintf("    /   / \\   \\             %s: v%s", t.HeaderVersion, version),
+		fmt.Sprintf("   |   /   \\   |            %s: %s", t.HeaderDirectory, sysCtx.WorkingDir),
+		fmt.Sprintf("   |   \\_/    |            %s: %s (%s)", t.HeaderOS, sysCtx.OS, sysCtx.DistroName),
+		fmt.Sprintf("    \\        /              %s: %s", t.HeaderShell, sysCtx.Shell),
+		fmt.Sprintf("     '------'               %s: %s", t.HeaderModel, model),
 	}
 
 	for _, line := range lines {
