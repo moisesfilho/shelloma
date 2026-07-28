@@ -18,3 +18,12 @@ dist/
 *.tmp
 *.log
 test_output.txt
+
+# Cobertura de testes
+coverage.out
+
+# Ferramentas de Empacotamento/Build
+appimagetool
+
+# Configurações locais
+opencode.json
