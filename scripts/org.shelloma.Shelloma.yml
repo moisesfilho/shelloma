@@ -15,18 +15,7 @@ modules:
       - install -D -m 644 scripts/shelloma.desktop /app/share/applications/org.shelloma.Shelloma.desktop
       - install -D -m 644 scripts/org.shelloma.Shelloma.appdata.xml /app/share/metainfo/org.shelloma.Shelloma.appdata.xml
       - install -D -m 644 scripts/org.shelloma.Shelloma.svg /app/share/icons/hicolor/scalable/apps/org.shelloma.Shelloma.svg
-      - python3 -c "
-import base64, os, re
-with open('scripts/org.shelloma.Shelloma.svg') as f:
-    svg = f.read()
-m = re.search(r'href=\"data:image/png;base64,([^\"]+)\"', svg)
-png = base64.b64decode(m.group(1))
-for sz in [64,128,256,512]:
-    d = f'/app/share/icons/hicolor/{sz}x{sz}/apps'
-    os.makedirs(d, exist_ok=True)
-    with open(f'{d}/org.shelloma.Shelloma.png', 'wb') as f:
-        f.write(png)
-"
+      - python3 scripts/extract-icons.py "64=/app/share/icons/hicolor/64x64/apps/org.shelloma.Shelloma.png" "128=/app/share/icons/hicolor/128x128/apps/org.shelloma.Shelloma.png" "256=/app/share/icons/hicolor/256x256/apps/org.shelloma.Shelloma.png" "512=/app/share/icons/hicolor/512x512/apps/org.shelloma.Shelloma.png"
     sources:
       - type: dir
         path: ..
