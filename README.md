@@ -26,10 +26,13 @@
 
 - 🚀 **Native & Lightweight**: Single self-contained binary compiled in Go for Linux, macOS, and Windows.
 - 🔒 **100% Private & Offline**: All data and commands stay on your local machine.
-- 🌐 **Native Internationalization (i18n)**: Full support for **English (`en`)**, **Brazilian Portuguese (`pt`)**, and **Spanish (`es`)** via embedded JSON files (`embed.FS`).
+- 🌐 **Native Internationalization (i18n)**: Full support for **English (`en`)**, **Brazilian Portuguese (`pt`)**, and **Spanish (`es`)** via embedded JSON files (with translated header and messages).
 - 🤖 **Automatic Model Selection**: Automatically detects installed Ollama models and selects the best available coding/shell model.
-- 💡 **Ollama Offline Recovery**: Detects when Ollama is offline and interactively offers to start the service based on your OS (`ollama serve`, `brew services start ollama`, `sudo systemctl start ollama`).
-- 📦 **Cross-Platform Distribution**: Binaries for Windows (`.exe`), macOS, and Linux (`.deb`, `.rpm`, AppImage, Flatpak).
+- 💡 **Ollama Offline Recovery**: Detects when Ollama is offline and interactively offers to start the service based on your OS.
+- 🖥️ **Centralized Scroll & Fixed Layout**: The header (lines 1-8) and footer (full-width reverse legend) remain fixed on the screen, allowing natural scrolling only for the central interactive content (prompts, suggestions, and outputs).
+- 🔄 **Interactive Command Refinement**: Allows adjusting the suggested command by selecting `[r: Refine]`, opening an interactive prompt to supply additional feedback or changes.
+- 🧭 **Interactive History with Arrows**: All interactive input prompts use a raw terminal reader that enables history navigation with `Up`/`Down` arrows and cursor movement with `Left`/`Right` arrows.
+- 📦 **Cross-Platform Distribution**: Binaries for Windows (`.exe`), macOS, and Linux (`.deb`, `.rpm`, AppImage, Flatpak). Includes native Linux desktop integration (generating a `.desktop` launcher and registering the official SVG icon).
 - ⛓️ **Multi-Step Command Execution**: Executes multi-step command sequences step-by-step with confirmation prompts and logs each step.
 
 ---
@@ -190,18 +193,17 @@ shelloma -l es "mostrar procesos que consumen mas cpu"
 When a command is generated, Shelloma displays the card and waits for your choice:
 
 ```text
-┌────────────────────────────────────────────┐
-│  ls -la ~/Downloads/*.pdf                 │
-└────────────────────────────────────────────┘
-
-Options: [Enter/y: Execute] [e: Explain] [m: Modify] [c: Copy] [q/n: Quit]:
+Options: [Enter/y: Execute] [e: Explain] [m: Modify] [c: Copy] [p: New Prompt] [r: Refine] [a: Adjust Prompt] [q/n: Quit]:
 ```
 
-- **Press `Enter` or `y`**: Executes the command directly in terminal.
-- **Type `e`**: Requests a line-by-line explanation from Ollama.
-- **Type `m`**: Opens a prompt to edit the command before execution.
+- **Press `Enter` or `y`**: Executes the command directly in the terminal.
+- **Type `e`**: Requests a detailed, line-by-line explanation of the command from Ollama.
+- **Type `m`**: Opens a prompt to manually edit the command before execution.
 - **Type `c`**: Copies the command directly to your system clipboard.
-- **Type `q` or `n`**: Cancels the operation safely.
+- **Type `p`**: Prompts for a completely new command instruction without quitting Shelloma.
+- **Type `r`**: Refines the suggested command by opening an interactive prompt to supply additional feedback or adjustments for the LLM to generate a revised suggestion.
+- **Type `a`**: Adjusts/edits the original natural language query prompt that triggered the suggestion.
+- **Type `q` or `n`**: Cancels the operation and exits safely.
 
 ### Configuration & Utilities
 

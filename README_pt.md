@@ -26,10 +26,13 @@ O **Shelloma** é uma aplicação CLI nativa e ultrarrápida desenvolvida em Go 
 
 - 🚀 **Nativo e Leve**: Executável único compilado em Go para Linux, macOS e Windows.
 - 🔒 **100% Privado e Offline**: Nenhum dado ou comando sai da sua máquina.
-- 🌐 **Internacionalização Nativa (i18n)**: Suporte completo para **Português Brasileiro (`pt`)**, **Inglês (`en`)** e **Espanhol (`es`)** através de arquivos JSON embarcados.
+- 🌐 **Internacionalização Nativa (i18n)**: Suporte completo para **Português Brasileiro (`pt`)**, **Inglês (`en`)** e **Espanhol (`es`)** através de arquivos JSON embarcados (com cabeçalho e mensagens traduzidos).
 - 🤖 **Seleção Automática de Modelo**: Detecta os modelos instalados no Ollama e seleciona automaticamente o melhor modelo focado em código/shell disponível.
-- 💡 **Detecção e Inicialização do Ollama**: Se o serviço Ollama estiver parado, o Shelloma avisa e oferece um comando rápido interativo para iniciá-lo de acordo com seu SO (`ollama serve`, `brew services start ollama`, `sudo systemctl start ollama`).
-- 📦 **Instalação Multiplataforma**: Executáveis compilados (`.exe`, binários nativos) e pacotes Linux (`.deb`, `.rpm`, AppImage, Flatpak).
+- 💡 **Detecção e Inicialização do Ollama**: Se o serviço Ollama estiver parado, o Shelloma avisa e oferece um comando rápido interativo para iniciá-lo de acordo com seu SO.
+- 🖥️ **Interface com Scroll Centralizado e Layout Fixo**: O cabeçalho (linhas 1-8) e o rodapé (legenda de largura total) são mantidos fixos na tela, permitindo a rolagem natural apenas do conteúdo interativo central (entradas e saídas de comandos).
+- 🔄 **Refinamento Interativo de Comandos**: Permite ajustar o comando sugerido escolhendo a opção `[r: Refinar]`, abrindo uma caixa interativa para complementar a instrução original.
+- 🧭 **Histórico Interativo com Setas**: Todos os prompts interativos usam um leitor raw que habilita navegação no histórico com setas `Up`/`Down` e posicionamento por setas `Left`/`Right`.
+- 📦 **Instalação Multiplataforma**: Executáveis compilados (`.exe`, binários nativos) e pacotes Linux (`.deb`, `.rpm`, AppImage, Flatpak). Inclui integração desktop Linux (gerando o atalho `.desktop` e registrando o ícone oficial do aplicativo em formato vetorial SVG).
 - ⛓️ **Execução Multi Etapa**: Executa sequências de comandos multi etapa passo a passo com confirmações e gera logs para cada comando.
 
 ---
@@ -190,18 +193,17 @@ shelloma -l es "mostrar procesos que consumen mas cpu"
 Ao gerar o comando, o Shelloma exibirá o card e aguardará sua ação:
 
 ```text
-┌────────────────────────────────────────────┐
-│  ls -la ~/Downloads/*.pdf                 │
-└────────────────────────────────────────────┘
-
-Opções: [Enter/y: Executar] [e: Explicar] [m: Modificar] [c: Copiar] [q/n: Sair]:
+Opções: [Enter/y: Executar] [e: Explicar] [m: Modificar] [c: Copiar] [p: Novo Prompt] [r: Refinar] [a: Ajustar Prompt] [q/n: Sair]:
 ```
 
 - **Pressionar `Enter` ou `y`**: Executa o comando diretamente no terminal.
-- **Digite `e`**: Solicita uma explicação linha por linha do comando ao Ollama.
-- **Digite `m`**: Abre um prompt para você editar o comando antes de executar.
-- **Digite `c`**: Copia o comando diretamente para a área de transferência do sistema.
-- **Digite `q` ou `n`**: Cancela a operação de forma segura.
+- **Digite `e`**: Solicita uma explicação detalhada e linha por linha do comando ao Ollama.
+- **Digite `m`**: Abre um prompt para você reescrever/modificar o comando manualmente antes de executar.
+- **Digite `c`**: Copia o comando diretamente para a área de transferência do sistema (clipboard).
+- **Digite `p`**: Solicita um novo prompt de comandos do início, sem precisar sair do Shelloma.
+- **Digite `r`**: Refina o comando gerado, fornecendo feedback ou ajustes adicionais para que o LLM crie uma nova sugestão revisada.
+- **Digite `a`**: Permite reajustar/editar o prompt textual original que deu origem à sugestão de comando.
+- **Digite `q` ou `n`**: Cancela a operação e encerra a aplicação com segurança.
 
 ### Comandos de Configuração e Utilitários
 

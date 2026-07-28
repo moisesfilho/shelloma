@@ -8,7 +8,7 @@
   "reason": "Reason:",
   "fix_suggestion": "Suggested command for execution:",
   "success_fix_return": "Suggestion executed successfully! Returning to previous command:",
-  "options_prompt": "Options: [Enter/y: Execute] [e: Explain] [m: Modify] [c: Copy] [q/n: Quit]: ",
+  "options_prompt": "Options: [Enter/y: Execute] [e: Explain] [m: Modify] [c: Copy] [p: New Prompt] [r: Refine] [a: Adjust Prompt] [q/n: Quit]: ",
   "current_command": "Current command:",
   "new_command": "New command:",
   "copied_to_clipboard": "Command copied to clipboard!",
@@ -60,5 +60,17 @@
   "flag_url_help": "Ollama API URL (default: http://localhost:11434)",
   "flag_lang_help": "Language: en, pt, es (default: en)",
   "flag_yes_help": "Execute generated command automatically without confirmation",
-  "flag_version_help": "Display Shelloma version"
+  "flag_version_help": "Display Shelloma version",
+  "press_enter_to_exit": "Press Enter to exit...",
+  "flag_desktop_help": "Run in desktop terminal mode (pauses before exiting)",
+  "anything_else_prompt": "Prompt: ",
+  "refine_prompt_label": "Refine: ",
+  "initial_prompt_label": "Prompt: ",
+  "option_choice_label": "Choose an option: ",
+  "input_prompt_legend": "[Enter: Confirm/Exit if empty] [Arrows ▲ / ▼ : History] [Arrows ◄ / ► : Cursor]",
+  "header_version": "Version   ",
+  "header_directory": "Directory ",
+  "header_os": "OS        ",
+  "header_shell": "Shell     ",
+  "header_model": "Model     "
 }

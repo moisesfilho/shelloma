@@ -12,6 +12,8 @@ import (
 	"shelloma/pkg/ui"
 )
 
+var IsDesktop bool
+
 func ParseLanguageOverride(cfg *config.Config) {
 	for i, arg := range os.Args {
 		if (arg == "-l" || arg == "--lang" || strings.HasPrefix(arg, "-l=") || strings.HasPrefix(arg, "--lang=")) && i+1 < len(os.Args) {
@@ -25,7 +27,7 @@ func ParseLanguageOverride(cfg *config.Config) {
 	}
 }
 
-func SetupFlags(modelFlag, urlFlag, langFlag *string, yesFlag, verFlag *bool, t i18n.Translations, version string) {
+func SetupFlags(modelFlag, urlFlag, langFlag *string, yesFlag, verFlag, desktopFlag *bool, t i18n.Translations, version string) {
 	flag.StringVar(modelFlag, "m", "", t.FlagModelHelp)
 	flag.StringVar(modelFlag, "model", "", t.FlagModelHelp)
 	flag.StringVar(urlFlag, "url", "", t.FlagURLHelp)
@@ -35,6 +37,7 @@ func SetupFlags(modelFlag, urlFlag, langFlag *string, yesFlag, verFlag *bool, t 
 	flag.BoolVar(yesFlag, "yes", false, t.FlagYesHelp)
 	flag.BoolVar(verFlag, "v", false, t.FlagVersionHelp)
 	flag.BoolVar(verFlag, "version", false, t.FlagVersionHelp)
+	flag.BoolVar(desktopFlag, "desktop", false, t.FlagDesktopHelp)
 
 	flag.Usage = func() {
 		fmt.Printf("%sShelloma v%s%s - %s\n\n", ui.Bold+ui.Cyan, version, ui.Reset, t.HelpTitle)
@@ -69,22 +72,31 @@ func ApplyFlagOverrides(cfg *config.Config, modelFlag, urlFlag, langFlag string,
 	}
 }
 
-func GetOrPromptUserQuery(args []string, ver string, t i18n.Translations) string {
+func GetOrPromptUserQuery(args []string, t i18n.Translations) string {
 	query := strings.Join(args, " ")
 	if strings.TrimSpace(query) == "" {
-		fmt.Printf("%s%s[Shelloma v%s]%s Prompt: ", ui.Bold, ui.Cyan, ver, ui.Reset)
+		promptStr := fmt.Sprintf("%s%s%s%s", ui.Bold, ui.Cyan, t.InitialPromptLabel, ui.Reset)
+		history, _ := config.LoadHistory()
 		var err error
-		query, err = readLineFromStdin()
+		query, err = ui.ReadLineWithHistory(promptStr, "", history, t)
 		if err != nil || strings.TrimSpace(query) == "" {
 			fmt.Printf("\n%s\n", t.NoInstructionProvided)
+			ui.ClearLegendAtBottom()
 			os.Exit(0)
 		}
 	}
 	return query
 }
 
-func readLineFromStdin() (string, error) {
-	reader := bufio.NewReader(os.Stdin)
-	line, err := reader.ReadString('\n')
-	return strings.TrimSpace(line), err
+func Exit(code int, t i18n.Translations) {
+	ui.ClearLegendAtBottom()
+	if IsDesktop {
+		msg := t.PressEnterToExit
+		if msg == "" {
+			msg = "Press Enter to exit..."
+		}
+		fmt.Printf("\n%s%s%s\n", ui.Gray, msg, ui.Reset)
+		_, _ = bufio.NewReader(os.Stdin).ReadBytes('\n')
+	}
+	os.Exit(code)
 }

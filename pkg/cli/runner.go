@@ -61,9 +61,9 @@ func ConnectOrRecoverOllama(cfg config.Config, t i18n.Translations) ollama.LLMPr
 				fmt.Print("                                                                \r")
 				fmt.Printf("%s%v%s\n", ui.Red, retryErr, ui.Reset)
 			}
-			os.Exit(1)
+			Exit(1, t)
 		} else if action == ui.ActionQuit {
-			os.Exit(1)
+			Exit(1, t)
 		}
 	}
 }

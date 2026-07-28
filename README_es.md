@@ -26,10 +26,13 @@
 
 - 🚀 **Nativo y Ligero**: Ejecutable único compilado en Go para Linux, macOS y Windows.
 - 🔒 **100% Privado y Offline**: Todos tus datos y comandos permanecen localmente en tu equipo.
-- 🌐 **Internacionalización Nativa (i18n)**: Soporte completo para **Inglés (`en`)**, **Portugués Brasileño (`pt`)** y **Español (`es`)** mediante archivos JSON incrustados.
+- 🌐 **Internacionalización Nativa (i18n)**: Soporte completo para **Inglés (`en`)**, **Portugués Brasileño (`pt`)** y **Español (`es`)** mediante archivos JSON incrustados (con encabezados y mensajes traducidos).
 - 🤖 **Selección Automática de Modelo**: Detecta los modelos instalados en Ollama y selecciona automáticamente el mejor modelo orientado a código y terminal disponible.
-- 💡 **Recuperación de Ollama Offline**: Detecta cuando Ollama está fuera de línea y te ofrece de forma interactiva iniciar el servicio según tu SO (`ollama serve`, `brew services start ollama`, `sudo systemctl start ollama`).
-- 📦 **Distribución Multiplataforma**: Ejecutables para Windows (`.exe`), macOS y Linux (`.deb`, `.rpm`, AppImage, Flatpak).
+- 💡 **Recuperación de Ollama Offline**: Detecta cuando Ollama está fuera de línea y te ofrece de forma interactiva iniciar el servicio según tu SO.
+- 🖥️ **Desplazamiento Centralizado y Diseño Fijo**: El encabezado (líneas 1-8) y el pie de página (leyenda de ancho completo invertida) permanecen fijos en la pantalla, permitiendo el desplazamiento natural solo para el contenido interactivo central (prompts, sugerencias y salidas).
+- 🔄 **Refinamento Interactivo de Comandos**: Permite ajustar el comando sugerido seleccionando `[r: Refinar]`, abriendo un prompt interactivo para proporcionar comentarios o ajustes adicionales.
+- 🧭 **Historial Interactivo con Flechas**: Todos los prompts de entrada interactivos utilizan un lector raw de terminal que habilita la navegación por el historial con flechas `Arriba`/`Abajo` y el movimiento del cursor con flechas `Izquierda`/`Derecha`.
+- 📦 **Distribución Multiplataforma**: Ejecutables para Windows (`.exe`), macOS y Linux (`.deb`, `.rpm`, AppImage, Flatpak). Incluye integración nativa con el escritorio Linux (generando un lanzador `.desktop` y registrando el icono oficial en formato SVG).
 - ⛓️ **Ejecución de Múltiples Etapas**: Ejecuta secuencias de comandos de múltiples etapas paso a paso con confirmaciones y registra cada etapa.
 
 ---
@@ -190,18 +193,17 @@ shelloma -l pt "listar todos os arquivos da pasta atual"
 Al generar un comando, Shelloma mostrará la tarjeta y esperará tu elección:
 
 ```text
-┌────────────────────────────────────────────┐
-│  ls -la ~/Downloads/*.pdf                 │
-└────────────────────────────────────────────┘
-
-Opciones: [Enter/y: Ejecutar] [e: Explicar] [m: Modificar] [c: Copiar] [q/n: Salir]:
+Opciones: [Enter/y: Ejecutar] [e: Explicar] [m: Modificar] [c: Copiar] [p: Nuevo Prompt] [r: Refinar] [a: Ajustar Prompt] [q/n: Salir]:
 ```
 
 - **Presionar `Enter` o `y`**: Ejecuta el comando directamente en la terminal.
 - **Escribir `e`**: Solicita a Ollama una explicación detallada línea por línea.
-- **Escribir `m`**: Abre un aviso para editar el comando antes de ejecutarlo.
+- **Escribir `m`**: Abre un prompt para reescribir/modificar el comando manualmente antes de ejecutarlo.
 - **Escribir `c`**: Copia el comando directamente al portapapeles del sistema.
-- **Escribir `q` o `n`**: Cancela la operación de forma segura.
+- **Escribir `p`**: Solicita un nuevo prompt de comandos desde el principio, sin tener que salir de Shelloma.
+- **Escribir `r`**: Refina el comando sugerido abriendo un prompt interactivo para proporcionar comentarios o ajustes adicionales para que el LLM genere una nueva sugerencia revisada.
+- **Escribir `a`**: Permite reajustar/editar el prompt textual original que originó la sugerencia del comando.
+- **Escribir `q` o `n`**: Cancela la operación y sale de forma segura.
 
 ### Configuración y Utilidades
 

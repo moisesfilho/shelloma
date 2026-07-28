@@ -26,8 +26,8 @@ mkdir -p "${APP_DIR}/usr/share/icons/hicolor/64x64/apps"
 
 cp scripts/org.shelloma.Shelloma.appdata.xml "${APP_DIR}/usr/share/metainfo/org.shelloma.Shelloma.appdata.xml"
 
-# Criar um ícone genérico SVG/PNG caso não exista
-echo '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#2d3748"/><text x="12" y="42" font-family="monospace" font-size="32" fill="#48bb78" font-weight="bold">&gt;_</text></svg>' > "${APP_DIR}/org.shelloma.Shelloma.svg"
+# Copiar o ícone SVG estático
+cp scripts/org.shelloma.Shelloma.svg "${APP_DIR}/org.shelloma.Shelloma.svg"
 cp "${APP_DIR}/org.shelloma.Shelloma.svg" "${APP_DIR}/org.shelloma.Shelloma.png"
 cp "${APP_DIR}/org.shelloma.Shelloma.png" "${APP_DIR}/usr/share/icons/hicolor/64x64/apps/org.shelloma.Shelloma.png"
 cp "${APP_DIR}/org.shelloma.Shelloma.png" "${APP_DIR}/shelloma.png"

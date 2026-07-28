@@ -8,7 +8,7 @@
   "reason": "Razón:",
   "fix_suggestion": "Sugerencia de comando para ejecución:",
   "success_fix_return": "¡Sugerencia ejecutada con éxito! Volviendo al comando anterior:",
-  "options_prompt": "Opciones: [Enter/y: Ejecutar] [e: Explicar] [m: Modificar] [c: Copiar] [q/n: Salir]: ",
+  "options_prompt": "Opciones: [Enter/y: Ejecutar] [e: Explicar] [m: Modificar] [c: Copiar] [p: Nuevo Prompt] [r: Refinar] [a: Ajustar Prompt] [q/n: Salir]: ",
   "current_command": "Comando actual:",
   "new_command": "Nuevo comando:",
   "copied_to_clipboard": "¡Comando copiado al portapapeles!",
@@ -60,5 +60,17 @@
   "flag_url_help": "URL de la API de Ollama (predeterminado: http://localhost:11434)",
   "flag_lang_help": "Idioma: en, pt, es (predeterminado: en)",
   "flag_yes_help": "Ejecutar el comando generado automáticamente sin confirmación",
-  "flag_version_help": "Mostrar versión de Shelloma"
+  "flag_version_help": "Mostrar versión de Shelloma",
+  "press_enter_to_exit": "Presione Enter para salir...",
+  "flag_desktop_help": "Ejecuta en modo terminal de escritorio (pausa antes de salir)",
+  "anything_else_prompt": "Prompt: ",
+  "refine_prompt_label": "Ajustar: ",
+  "initial_prompt_label": "Prompt: ",
+  "option_choice_label": "Elija una opción: ",
+  "input_prompt_legend": "[Enter: Confirmar/Salir si vacío] [Flechas ▲ / ▼ : Histórico] [Flechas ◄ / ► : Cursor]",
+  "header_version": "Versión   ",
+  "header_directory": "Directorio",
+  "header_os": "SO        ",
+  "header_shell": "Shell     ",
+  "header_model": "Modelo    "
 }

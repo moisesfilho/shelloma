@@ -18,6 +18,7 @@ type LLMProvider interface {
 	ExplainCommand(command string) (string, error)
 	AnalyzeExecutionResult(cmdStr string, exitCode int, output string, sysCtx sysinfo.SystemContext) (AnalysisResult, error)
 	GenerateFixCommand(sysCtx sysinfo.SystemContext, failedCmd string, errorOutput string) (string, error)
+	GenerateRefinedCommand(sysCtx sysinfo.SystemContext, originalPrompt string, previousCmd string, feedback string, temp float64) (string, error)
 	GetModel() string
 }
 

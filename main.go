@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"os"
+	"strings"
 
 	"shelloma/pkg/cli"
 	"shelloma/pkg/config"
@@ -18,26 +20,28 @@ func main() {
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		fmt.Printf("%sError loading config: %v%s\n", ui.Red, err, ui.Reset)
-		os.Exit(1)
+		cli.Exit(1, i18n.Translations{})
 	}
 
 	cli.ParseLanguageOverride(&cfg)
 	t := i18n.GetTranslations(cfg.Language)
 
 	var (
-		modelFlag string
-		urlFlag   string
-		langFlag  string
-		yesFlag   bool
-		verFlag   bool
+		modelFlag   string
+		urlFlag     string
+		langFlag    string
+		yesFlag     bool
+		verFlag     bool
+		desktopFlag bool
 	)
 
-	cli.SetupFlags(&modelFlag, &urlFlag, &langFlag, &yesFlag, &verFlag, t, version)
+	cli.SetupFlags(&modelFlag, &urlFlag, &langFlag, &yesFlag, &verFlag, &desktopFlag, t, version)
 	flag.Parse()
+	cli.IsDesktop = desktopFlag
 
 	if verFlag {
 		fmt.Printf("Shelloma v%s\n", version)
-		os.Exit(0)
+		cli.Exit(0, t)
 	}
 
 	cli.ApplyFlagOverrides(&cfg, modelFlag, urlFlag, langFlag, yesFlag, &t)
@@ -60,55 +64,114 @@ func main() {
 		}
 	}
 
-	userQuery := cli.GetOrPromptUserQuery(args, version, t)
 	sysCtx := sysinfo.GetSystemContext()
 
 	client := cli.ConnectOrRecoverOllama(cfg, t)
-	ui.PrintBanner(client.GetModel(), string(i18n.NormalizeLanguage(cfg.Language)))
-
-	fmt.Printf("%s⏳ %s%s\r", ui.Gray, t.ProcessingWithOllama, ui.Reset)
-	cmd, err := client.GenerateCommand(sysCtx, userQuery, cfg.Temperature)
-	if err != nil {
-		fmt.Printf("\n%s%s %v%s\n", ui.Red, t.ErrorPrefix, err, ui.Reset)
-		os.Exit(1)
-	}
-	fmt.Print("                                                                \r")
-
-	if cmd == "" {
-		fmt.Printf("%s%s%s\n", ui.Yellow, t.CommandNoValid, ui.Reset)
-		os.Exit(1)
+	interactiveMode := len(args) == 0 || cli.IsDesktop
+	if interactiveMode {
+		ui.SetupTerminal(sysCtx, client.GetModel(), version, t)
+	} else {
+		ui.PrintBanner(client.GetModel(), string(i18n.NormalizeLanguage(cfg.Language)))
 	}
 
-	ui.PrintCommandCard(cmd)
-	if !cfg.DisableDangerousCheck {
-		if isDanger, matched := config.CheckDangerous(cmd, cfg.DangerousCommands); isDanger {
-			ui.PrintDangerousWarning(matched, t)
-		}
-	}
-
-	if cfg.AutoExecute {
-		success, _, _ := cli.ExecuteMultiStep(client, &sysCtx, cmd, cfg, t, userQuery)
-		if success {
-			os.Exit(0)
-		}
-		os.Exit(1)
-	}
+	userQuery := cli.GetOrPromptUserQuery(args, t)
+	args = []string{}
 
 	for {
-		action := cli.HandleUserAction(client, sysCtx, &cmd, cfg, t)
-		switch action {
-		case ui.ActionExecute:
+		if interactiveMode {
+			ui.SetupTerminal(sysCtx, client.GetModel(), version, t)
+		}
+		config.AddToHistory(userQuery)
+		fmt.Printf("%s⏳ %s%s\r", ui.Gray, t.ProcessingWithOllama, ui.Reset)
+		cmd, err := client.GenerateCommand(sysCtx, userQuery, cfg.Temperature)
+		if err != nil {
+			fmt.Printf("\n%s%s %v%s\n", ui.Red, t.ErrorPrefix, err, ui.Reset)
+			cli.Exit(1, t)
+		}
+		fmt.Print("                                                                \r")
+
+		if cmd == "" {
+			fmt.Printf("%s%s%s\n", ui.Yellow, t.CommandNoValid, ui.Reset)
+			cli.Exit(1, t)
+		}
+
+		ui.PrintCommandCard(cmd)
+		if !cfg.DisableDangerousCheck {
+			if isDanger, matched := config.CheckDangerous(cmd, cfg.DangerousCommands); isDanger {
+				ui.PrintDangerousWarning(matched, t)
+			}
+		}
+
+		if cfg.AutoExecute {
 			success, _, _ := cli.ExecuteMultiStep(client, &sysCtx, cmd, cfg, t, userQuery)
 			if success {
-				os.Exit(0)
+				cli.Exit(0, t)
 			}
-			os.Exit(1)
-		case ui.ActionQuit:
-			cli.LogExecution(userQuery, cmd, "Quit", 0, "", sysCtx, cfg, client)
-			os.Exit(0)
-		case ui.ActionCopy:
-			cli.LogExecution(userQuery, cmd, "Copy", 0, "", sysCtx, cfg, client)
-			os.Exit(0)
+			cli.Exit(1, t)
+		}
+
+		actionNeeded := true
+		for actionNeeded {
+			action := cli.HandleUserAction(client, sysCtx, &cmd, cfg, t)
+			switch action {
+			case ui.ActionExecute:
+				success, _, _ := cli.ExecuteMultiStep(client, &sysCtx, cmd, cfg, t, userQuery)
+				history, _ := config.LoadHistory()
+				ans, err := ui.ReadLineWithHistory(fmt.Sprintf("%s%s%s%s", ui.Bold, ui.Cyan, t.AnythingElsePrompt, ui.Reset), "", history, t)
+				if err == io.EOF || strings.TrimSpace(ans) == "" {
+					if success {
+						exitApp(0)
+					}
+					exitApp(1)
+				}
+				userQuery = ans
+				actionNeeded = false
+			case ui.ActionQuit:
+				cli.LogExecution(userQuery, cmd, "Quit", 0, "", sysCtx, cfg, client)
+				exitApp(0) // No pause on explicit Quit
+			case ui.ActionCopy:
+				cli.LogExecution(userQuery, cmd, "Copy", 0, "", sysCtx, cfg, client)
+				cli.Exit(0, t)
+			case ui.ActionNewPrompt:
+				userQuery = cli.GetOrPromptUserQuery(args, t)
+				actionNeeded = false
+			case ui.ActionRefine:
+				history, _ := config.LoadHistory()
+				feedback, err := ui.ReadLineWithHistory(fmt.Sprintf("%s%s%s%s", ui.Bold, ui.Cyan, t.RefinePromptLabel, ui.Reset), "", history, t)
+				if err == io.EOF || strings.TrimSpace(feedback) == "" {
+					exitApp(0)
+				}
+				fmt.Printf("%s⏳ %s%s\r", ui.Gray, t.ProcessingWithOllama, ui.Reset)
+				refinedCmd, err := client.GenerateRefinedCommand(sysCtx, userQuery, cmd, feedback, cfg.Temperature)
+				fmt.Print("                                                                \r")
+				switch {
+				case err != nil:
+					fmt.Printf("\n%s%s %v%s\n", ui.Red, t.ErrorPrefix, err, ui.Reset)
+				case refinedCmd == "":
+					fmt.Printf("\n%s%s%s\n", ui.Yellow, t.CommandNoValid, ui.Reset)
+				default:
+					cmd = refinedCmd
+					ui.PrintCommandCard(cmd)
+					if !cfg.DisableDangerousCheck {
+						if isDanger, matched := config.CheckDangerous(cmd, cfg.DangerousCommands); isDanger {
+							ui.PrintDangerousWarning(matched, t)
+						}
+					}
+				}
+			case ui.ActionAdjustPrompt:
+				promptStr := fmt.Sprintf("%s%s%s%s", ui.Bold, ui.Cyan, t.InitialPromptLabel, ui.Reset)
+				history, _ := config.LoadHistory()
+				newQuery, err := ui.ReadLineWithHistory(promptStr, userQuery, history, t)
+				if err == nil && strings.TrimSpace(newQuery) != "" {
+					userQuery = newQuery
+					actionNeeded = false
+				}
+			}
 		}
 	}
+}
+
+func exitApp(code int) {
+	ui.ClearLegendAtBottom()
+	os.Exit(code)
 }

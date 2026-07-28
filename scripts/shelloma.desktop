@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Shelloma
-Exec=shelloma
+Exec=shelloma --desktop
 Icon=org.shelloma.Shelloma
 Comment=Native natural language to Shell command translator powered by Ollama
 Categories=Utility;System;

@@ -16,4 +16,5 @@ const (
 	Gray    = "\033[90m"
 
 	BgDarkGray = "\033[48;5;236m"
+	Inverted   = "\033[7m"
 )

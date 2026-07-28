@@ -79,6 +79,20 @@ install-user: build
 	@cp $(BINARY_NAME) $(HOME)/.local/bin/$(BINARY_NAME)
 	@chmod +x $(HOME)/.local/bin/$(BINARY_NAME)
 	@echo "✔ $(BINARY_NAME) instalado com sucesso em $(HOME)/.local/bin/$(BINARY_NAME)"
+	@mkdir -p $(HOME)/.local/share/applications
+	@cp scripts/shelloma.desktop $(HOME)/.local/share/applications/org.shelloma.Shelloma.desktop
+	@sed -i "s|Exec=shelloma --desktop|Exec=$(HOME)/.local/bin/shelloma --desktop|g" $(HOME)/.local/share/applications/org.shelloma.Shelloma.desktop
+	@sed -i "s|Icon=org.shelloma.Shelloma|Icon=$(HOME)/.local/share/icons/hicolor/scalable/apps/org.shelloma.Shelloma.svg|g" $(HOME)/.local/share/applications/org.shelloma.Shelloma.desktop
+	@chmod +x $(HOME)/.local/share/applications/org.shelloma.Shelloma.desktop
+	@mkdir -p $(HOME)/.local/share/icons/hicolor/scalable/apps
+	@cp scripts/org.shelloma.Shelloma.svg $(HOME)/.local/share/icons/hicolor/scalable/apps/org.shelloma.Shelloma.svg
+	@cp scripts/org.shelloma.Shelloma.svg $(HOME)/.local/share/icons/org.shelloma.Shelloma.svg
+	@mkdir -p $(HOME)/.icons
+	@cp scripts/org.shelloma.Shelloma.svg $(HOME)/.icons/org.shelloma.Shelloma.svg
+	@if command -v update-desktop-database >/dev/null 2>&1; then update-desktop-database $(HOME)/.local/share/applications; fi
+	@if command -v gtk-update-icon-cache >/dev/null 2>&1; then gtk-update-icon-cache -f -t $(HOME)/.local/share/icons/hicolor || true; fi
+	@echo "✔ Ícone e atalho desktop instalados com sucesso"
+
 
 clean:
 	@rm -rf $(BINARY_NAME) build dist *.deb *.rpm *.AppImage *.flatpak appimagetool

@@ -83,6 +83,19 @@ type Translations struct {
 	FlagLangHelp    string `json:"flag_lang_help"`
 	FlagYesHelp     string `json:"flag_yes_help"`
 	FlagVersionHelp string `json:"flag_version_help"`
+	PressEnterToExit string `json:"press_enter_to_exit"`
+	FlagDesktopHelp  string `json:"flag_desktop_help"`
+	AnythingElsePrompt string `json:"anything_else_prompt"`
+	RefinePromptLabel string `json:"refine_prompt_label"`
+	InitialPromptLabel string `json:"initial_prompt_label"`
+	OptionChoiceLabel  string `json:"option_choice_label"`
+	InputPromptLegend  string `json:"input_prompt_legend"`
+
+	HeaderVersion   string `json:"header_version"`
+	HeaderDirectory string `json:"header_directory"`
+	HeaderOS        string `json:"header_os"`
+	HeaderShell     string `json:"header_shell"`
+	HeaderModel     string `json:"header_model"`
 }
 
 var loadedDict = make(map[Language]Translations)

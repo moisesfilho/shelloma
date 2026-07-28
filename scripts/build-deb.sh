@@ -16,10 +16,16 @@ mkdir -p "${BUILD_DIR}/usr/bin"
 mkdir -p "${BUILD_DIR}/etc/shelloma"
 mkdir -p "${BUILD_DIR}/usr/share/doc/shelloma"
 mkdir -p "${BUILD_DIR}/usr/share/bash-completion/completions"
+mkdir -p "${BUILD_DIR}/usr/share/applications"
+mkdir -p "${BUILD_DIR}/usr/share/icons/hicolor/scalable/apps"
 
 # Copiar executável
 cp shelloma "${BUILD_DIR}/usr/bin/shelloma"
 chmod 755 "${BUILD_DIR}/usr/bin/shelloma"
+
+# Copiar arquivo desktop e ícone SVG
+cp scripts/shelloma.desktop "${BUILD_DIR}/usr/share/applications/org.shelloma.Shelloma.desktop"
+cp scripts/org.shelloma.Shelloma.svg "${BUILD_DIR}/usr/share/icons/hicolor/scalable/apps/org.shelloma.Shelloma.svg"
 
 # Gerar arquivo DEBIAN/control
 cat <<EOF > "${BUILD_DIR}/DEBIAN/control"
