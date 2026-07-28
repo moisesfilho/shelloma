@@ -26,9 +26,9 @@ mkdir -p "${APP_DIR}/usr/share/icons/hicolor/64x64/apps"
 
 cp scripts/org.shelloma.Shelloma.appdata.xml "${APP_DIR}/usr/share/metainfo/org.shelloma.Shelloma.appdata.xml"
 
-# Copiar o ícone SVG estático
+# Copiar o ícone SVG e gerar PNGs a partir dele
 cp scripts/org.shelloma.Shelloma.svg "${APP_DIR}/org.shelloma.Shelloma.svg"
-cp "${APP_DIR}/org.shelloma.Shelloma.svg" "${APP_DIR}/org.shelloma.Shelloma.png"
+python3 scripts/generate-icons.py "64=${APP_DIR}/org.shelloma.Shelloma.png"
 cp "${APP_DIR}/org.shelloma.Shelloma.png" "${APP_DIR}/usr/share/icons/hicolor/64x64/apps/org.shelloma.Shelloma.png"
 cp "${APP_DIR}/org.shelloma.Shelloma.png" "${APP_DIR}/shelloma.png"
 

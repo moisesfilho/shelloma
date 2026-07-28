@@ -15,6 +15,7 @@ modules:
       - install -D -m 644 scripts/shelloma.desktop /app/share/applications/org.shelloma.Shelloma.desktop
       - install -D -m 644 scripts/org.shelloma.Shelloma.appdata.xml /app/share/metainfo/org.shelloma.Shelloma.appdata.xml
       - install -D -m 644 scripts/org.shelloma.Shelloma.svg /app/share/icons/hicolor/scalable/apps/org.shelloma.Shelloma.svg
+      - python3 scripts/generate-icons.py "64=/app/share/icons/hicolor/64x64/apps/org.shelloma.Shelloma.png" "128=/app/share/icons/hicolor/128x128/apps/org.shelloma.Shelloma.png" "256=/app/share/icons/hicolor/256x256/apps/org.shelloma.Shelloma.png" "512=/app/share/icons/hicolor/512x512/apps/org.shelloma.Shelloma.png"
     sources:
       - type: dir
         path: ..

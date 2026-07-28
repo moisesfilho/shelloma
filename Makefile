@@ -5,7 +5,11 @@ VERSION=1.2.2
 
 all: build
 
-build: lint test
+icons:
+	@if [ ! -f scripts/generate-icons.py ]; then echo "✖ scripts/generate-icons.py não encontrado"; exit 1; fi
+	@python3 scripts/generate-icons.py --regenerate
+
+build: lint test icons
 	@echo "🔨 Compilando $(BINARY_NAME) (nativo local)..."
 	go build -ldflags="-s -w" -o $(BINARY_NAME) .
 	@echo "✔ Binário gerado em ./$(BINARY_NAME)"
@@ -82,10 +86,15 @@ install-user: build
 	@mkdir -p $(HOME)/.local/share/applications
 	@cp scripts/shelloma.desktop $(HOME)/.local/share/applications/org.shelloma.Shelloma.desktop
 	@sed -i "s|Exec=shelloma --desktop|Exec=$(HOME)/.local/bin/shelloma --desktop|g" $(HOME)/.local/share/applications/org.shelloma.Shelloma.desktop
-	@sed -i "s|Icon=org.shelloma.Shelloma|Icon=$(HOME)/.local/share/icons/hicolor/scalable/apps/org.shelloma.Shelloma.svg|g" $(HOME)/.local/share/applications/org.shelloma.Shelloma.desktop
 	@chmod +x $(HOME)/.local/share/applications/org.shelloma.Shelloma.desktop
 	@mkdir -p $(HOME)/.local/share/icons/hicolor/scalable/apps
 	@cp scripts/org.shelloma.Shelloma.svg $(HOME)/.local/share/icons/hicolor/scalable/apps/org.shelloma.Shelloma.svg
+	@for size in 64 128 256 512; do \
+		mkdir -p $(HOME)/.local/share/icons/hicolor/$${size}x$${size}/apps; \
+		python3 scripts/generate-icons.py $$size; \
+		cp $$size.png $(HOME)/.local/share/icons/hicolor/$${size}x$${size}/apps/org.shelloma.Shelloma.png; \
+		rm -f $$size.png; \
+	done
 	@cp scripts/org.shelloma.Shelloma.svg $(HOME)/.local/share/icons/org.shelloma.Shelloma.svg
 	@mkdir -p $(HOME)/.icons
 	@cp scripts/org.shelloma.Shelloma.svg $(HOME)/.icons/org.shelloma.Shelloma.svg

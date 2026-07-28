@@ -78,6 +78,8 @@ nfpms:
     contents:
       - src: scripts/shelloma.desktop
         dst: /usr/share/applications/shelloma.desktop
+      - src: scripts/org.shelloma.Shelloma.svg
+        dst: /usr/share/icons/hicolor/scalable/apps/org.shelloma.Shelloma.svg
 
 snapcrafts:
   - id: shelloma
