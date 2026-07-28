@@ -99,6 +99,7 @@ type Translations struct {
 
 	RequestingNewApproach string `json:"requesting_new_approach"`
 	AICannotHelp          string `json:"ai_cannot_help"`
+	StepExecuteLegend     string `json:"step_execute_legend"`
 }
 
 var loadedDict = make(map[Language]Translations)

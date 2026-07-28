@@ -269,6 +269,7 @@ func ExecuteMultiStep(client ollama.LLMProvider, sysCtx *sysinfo.SystemContext, 
 		stepNum := i + 1
 		fmt.Printf("\n%s👉 [%d/%d] %s%s\n", ui.Bold+ui.Yellow, stepNum, len(steps), step, ui.Reset)
 		if !cfg.AutoExecute {
+			ui.DrawLegendAtBottom(t.StepExecuteLegend)
 			fmt.Printf(t.ConfirmStepPrompt, stepNum, len(steps))
 			reader := bufio.NewReader(ui.StdinReader)
 			choice, _ := reader.ReadString('\n')
