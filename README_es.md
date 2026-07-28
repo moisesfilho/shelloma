@@ -29,7 +29,7 @@
 - 🌐 **Internacionalización Nativa (i18n)**: Soporte completo para **Inglés (`en`)**, **Portugués Brasileño (`pt`)** y **Español (`es`)** mediante archivos JSON incrustados (con encabezados y mensajes traducidos).
 - 🤖 **Selección Automática de Modelo**: Detecta los modelos instalados en Ollama y selecciona automáticamente el mejor modelo orientado a código y terminal disponible.
 - 💡 **Recuperación de Ollama Offline**: Detecta cuando Ollama está fuera de línea y te ofrece de forma interactiva iniciar el servicio según tu SO.
-- 🖥️ **Desplazamiento Centralizado y Diseño Fijo**: El encabezado (líneas 1-8) y el pie de página (leyenda de ancho completo invertida) permanecen fijos en la pantalla, permitiendo el desplazamiento natural solo para el contenido interactivo central (prompts, sugerencias y salidas).
+- 🖥️ **Interfaz Adaptativa con Pie de Página Fijo**: Solo el pie de página con la leyenda de atajos permanece fijo en la base del terminal, sin interferir con el desplazamiento natural de la zona de entrada y del encabezado.
 - 🔄 **Refinamento Interactivo de Comandos**: Permite ajustar el comando sugerido seleccionando `[r: Refinar]`, abriendo un prompt interactivo para proporcionar comentarios o ajustes adicionales.
 - 🧭 **Historial Interactivo con Flechas**: Todos los prompts de entrada interactivos utilizan un lector raw de terminal que habilita la navegación por el historial con flechas `Arriba`/`Abajo` y el movimiento del cursor con flechas `Izquierda`/`Derecha`.
 - 📦 **Distribución Multiplataforma**: Ejecutables para Windows (`.exe`), macOS y Linux (`.deb`, `.rpm`, AppImage, Flatpak). Incluye integración nativa con el escritorio Linux (generando un lanzador `.desktop` y registrando el icono oficial en formato SVG).

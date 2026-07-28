@@ -29,7 +29,7 @@
 - 🌐 **Native Internationalization (i18n)**: Full support for **English (`en`)**, **Brazilian Portuguese (`pt`)**, and **Spanish (`es`)** via embedded JSON files (with translated header and messages).
 - 🤖 **Automatic Model Selection**: Automatically detects installed Ollama models and selects the best available coding/shell model.
 - 💡 **Ollama Offline Recovery**: Detects when Ollama is offline and interactively offers to start the service based on your OS.
-- 🖥️ **Centralized Scroll & Fixed Layout**: The header (lines 1-8) and footer (full-width reverse legend) remain fixed on the screen, allowing natural scrolling only for the central interactive content (prompts, suggestions, and outputs).
+- 🖥️ **Adaptive Interface with Fixed Footer**: Only the footer legend remains fixed at the bottom of the terminal window, without interrupting the natural scrolling of the header and active prompt workspace.
 - 🔄 **Interactive Command Refinement**: Allows adjusting the suggested command by selecting `[r: Refine]`, opening an interactive prompt to supply additional feedback or changes.
 - 🧭 **Interactive History with Arrows**: All interactive input prompts use a raw terminal reader that enables history navigation with `Up`/`Down` arrows and cursor movement with `Left`/`Right` arrows.
 - 📦 **Cross-Platform Distribution**: Binaries for Windows (`.exe`), macOS, and Linux (`.deb`, `.rpm`, AppImage, Flatpak). Includes native Linux desktop integration (generating a `.desktop` launcher and registering the official SVG icon).

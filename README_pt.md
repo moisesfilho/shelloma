@@ -29,7 +29,7 @@ O **Shelloma** é uma aplicação CLI nativa e ultrarrápida desenvolvida em Go 
 - 🌐 **Internacionalização Nativa (i18n)**: Suporte completo para **Português Brasileiro (`pt`)**, **Inglês (`en`)** e **Espanhol (`es`)** através de arquivos JSON embarcados (com cabeçalho e mensagens traduzidos).
 - 🤖 **Seleção Automática de Modelo**: Detecta os modelos instalados no Ollama e seleciona automaticamente o melhor modelo focado em código/shell disponível.
 - 💡 **Detecção e Inicialização do Ollama**: Se o serviço Ollama estiver parado, o Shelloma avisa e oferece um comando rápido interativo para iniciá-lo de acordo com seu SO.
-- 🖥️ **Interface com Scroll Centralizado e Layout Fixo**: O cabeçalho (linhas 1-8) e o rodapé (legenda de largura total) são mantidos fixos na tela, permitindo a rolagem natural apenas do conteúdo interativo central (entradas e saídas de comandos).
+- 🖥️ **Interface Adaptativa com Rodapé Fixo**: Apenas o rodapé com a legenda de atalhos permanece fixado na base do terminal, sem atrapalhar a rolagem natural da zona de digitação e do cabeçalho.
 - 🔄 **Refinamento Interativo de Comandos**: Permite ajustar o comando sugerido escolhendo a opção `[r: Refinar]`, abrindo uma caixa interativa para complementar a instrução original.
 - 🧭 **Histórico Interativo com Setas**: Todos os prompts interativos usam um leitor raw que habilita navegação no histórico com setas `Up`/`Down` e posicionamento por setas `Left`/`Right`.
 - 📦 **Instalação Multiplataforma**: Executáveis compilados (`.exe`, binários nativos) e pacotes Linux (`.deb`, `.rpm`, AppImage, Flatpak). Inclui integração desktop Linux (gerando o atalho `.desktop` e registrando o ícone oficial do aplicativo em formato vetorial SVG).

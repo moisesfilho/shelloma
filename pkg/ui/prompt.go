@@ -280,22 +280,26 @@ func SetupTerminal(sysCtx sysinfo.SystemContext, model string, version string, t
 	if runtime.GOOS == "windows" {
 		return
 	}
+	// 1. Resetar qualquer região de rolagem anterior
+	fmt.Print("\x1b[r")
+
 	rows, cols := getTerminalSize()
 
-	// 1. Limpar tela e mover cursor para o topo (1;1)
+	// 2. Limpar tela e mover cursor para o topo (1;1)
 	fmt.Print("\x1b[2J\x1b[H")
 
-	// 2. Imprimir borda superior do cabeçalho preenchendo toda a largura
+	// 3. Imprimir borda superior do cabeçalho preenchendo toda a largura
 	fmt.Printf("%s┌%s┐%s\n", Gray, strings.Repeat("─", cols-2), Reset)
 
-	// 3. Imprimir cada linha de conteúdo envelopada nas bordas laterais
+	// 4. Imprimir cada linha de conteúdo envelopada nas bordas laterais
 	lines := []string{
 		fmt.Sprintf("      /\\                 %sSHELLOMA - CLI ASSISTANT%s", Bold+Cyan, Reset),
 		"     /  \\                ------------------------",
 		fmt.Sprintf("    / /\\ \\               %s: v%s", t.HeaderVersion, version),
 		fmt.Sprintf("   ( (  ) )              %s: %s", t.HeaderDirectory, sysCtx.WorkingDir),
 		fmt.Sprintf("    \\ \\/ /               %s: %s (%s)", t.HeaderOS, sysCtx.OS, sysCtx.DistroName),
-		fmt.Sprintf("     \\__/                %s: %s  |  %s: %s", t.HeaderShell, sysCtx.Shell, t.HeaderModel, model),
+		fmt.Sprintf("     \\__/                %s: %s", t.HeaderShell, sysCtx.Shell),
+		fmt.Sprintf("                         %s: %s", t.HeaderModel, model),
 	}
 
 	for _, line := range lines {
@@ -308,19 +312,18 @@ func SetupTerminal(sysCtx sysinfo.SystemContext, model string, version string, t
 		fmt.Printf("%s│ %s%s │%s\n", Gray, Reset+padded, Gray, Reset)
 	}
 
-	// 4. Imprimir borda inferior do cabeçalho preenchendo toda a largura
+	// 5. Imprimir borda inferior do cabeçalho preenchendo toda a largura
 	fmt.Printf("%s└%s┘%s\n", Gray, strings.Repeat("─", cols-2), Reset)
 
-	// A altura total do cabeçalho é: 1 (topo) + 6 (linhas) + 1 (base) = 8 linhas.
-	// Definir margens de rolagem (começando na linha 9 e terminando na penúltima linha rows-1)
-	scrollStart := 9
+	// Definir margens de rolagem (de 1 a penúltima linha rows-1), deixando o rodapé (linha rows) fixo
+	scrollStart := 1
 	scrollEnd := rows - 1
 	if scrollEnd <= scrollStart {
 		scrollEnd = rows
 	}
 
 	fmt.Printf("\x1b[%d;%dr", scrollStart, scrollEnd)
-	fmt.Printf("\x1b[%d;1H", scrollStart)
+	fmt.Printf("\x1b[10;1H")
 }
 
 func ResetTerminal() {
