@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
@@ -47,18 +46,16 @@ func ConnectOrRecoverOllama(cfg config.Config, t i18n.Translations) ollama.LLMPr
 			exitCode, _, _ := ui.ExecuteCommand(startCmd, t)
 			if exitCode == 0 {
 				fmt.Printf("%s✔ %s%s\n", ui.Green+ui.Bold, t.Success, ui.Reset)
-				fmt.Printf("%s⏳ %s%s\r", ui.Gray, t.ProcessingWithOllama, ui.Reset)
+				fmt.Printf("%s⏳ %s%s\n", ui.Gray, t.ProcessingWithOllama, ui.Reset)
 
 				var retryErr error
 				for attempt := 1; attempt <= 6; attempt++ {
 					time.Sleep(1 * time.Second)
 					client, retryErr = ollama.NewClient(cfg)
 					if retryErr == nil {
-						fmt.Print("                                                                \r")
 						return client
 					}
 				}
-				fmt.Print("                                                                \r")
 				fmt.Printf("%s%v%s\n", ui.Red, retryErr, ui.Reset)
 			}
 			Exit(1, t)
@@ -75,9 +72,8 @@ func HandleUserAction(client ollama.LLMProvider, _ sysinfo.SystemContext, cmd *s
 		return ui.ActionExecute
 	case ui.ActionExplain:
 		if client != nil {
-			fmt.Printf("\n%s⏳ %s%s\r", ui.Gray, t.ExplainingWithOllama, ui.Reset)
+			fmt.Printf("\n%s⏳ %s%s\n", ui.Gray, t.ExplainingWithOllama, ui.Reset)
 			explanation, err := client.ExplainCommand(*cmd)
-			fmt.Print("                                                \r")
 			if err != nil {
 				fmt.Printf("%s%s %v%s\n\n", ui.Red, t.ErrorPrefix, err, ui.Reset)
 			} else {
@@ -118,21 +114,22 @@ func ExecuteWithRecovery(client ollama.LLMProvider, sysCtx sysinfo.SystemContext
 		}
 	}
 
+	ui.MoveToContentStart()
 	exitCode, output, _ := ui.ExecuteCommand(cmdStr, t)
 
-	fmt.Printf("%s🔍 %s%s\r", ui.Gray, t.AnalyzingResult, ui.Reset)
+	fmt.Printf("\n%s🔍 %s%s\n", ui.Gray, t.AnalyzingResult, ui.Reset)
 	analysis, errResult := client.AnalyzeExecutionResult(cmdStr, exitCode, output, sysCtx)
-	fmt.Print("                                                                      \r")
 
 	if errResult == nil && analysis.Success {
-		fmt.Printf("%s✔ %s%s\n", ui.Green+ui.Bold, t.Success, ui.Reset)
+		fmt.Printf("\n%s✔ %s%s\n", ui.Green+ui.Bold, t.Success, ui.Reset)
 		if analysis.Reason != "" && analysis.Reason != t.Success && analysis.Reason != "Comando executado com sucesso" && analysis.Reason != "Completed successfully" && analysis.Reason != "Completado con éxito" {
 			fmt.Printf("%s%s%s\n", ui.Gray, analysis.Reason, ui.Reset)
 		}
+		fmt.Println()
 		return true, exitCode, output
 	}
 
-	fmt.Printf("%s✖ %s%s\n", ui.Red+ui.Bold, t.Failed, ui.Reset)
+	fmt.Printf("\n%s✖ %s%s\n", ui.Red+ui.Bold, t.Failed, ui.Reset)
 	if analysis.Reason != "" {
 		fmt.Printf("%s%s%s %s\n", ui.Yellow+ui.Bold, t.Reason, ui.Reset, analysis.Reason)
 	} else {
@@ -142,14 +139,12 @@ func ExecuteWithRecovery(client ollama.LLMProvider, sysCtx sysinfo.SystemContext
 	suggestedCmd := analysis.SuggestedCommand
 	if suggestedCmd == "" || suggestedCmd == cmdStr {
 		if userQuery != "" {
-			fmt.Printf("%s⏳ %s%s\r", ui.Gray, t.RequestingNewApproach, ui.Reset)
+			fmt.Printf("\n%s⏳ %s%s\n", ui.Gray, t.RequestingNewApproach, ui.Reset)
 			suggestedCmd, _ = client.GenerateAlternativeCommand(sysCtx, userQuery, cmdStr, output)
-			fmt.Print("                                                       \r")
 		}
 		if suggestedCmd == "" || suggestedCmd == cmdStr {
-			fmt.Printf("%s⏳ %s%s\r", ui.Gray, t.ProcessingWithOllama, ui.Reset)
+			fmt.Printf("\n%s⏳ %s%s\n", ui.Gray, t.ProcessingWithOllama, ui.Reset)
 			suggestedCmd, _ = client.GenerateFixCommand(sysCtx, cmdStr, output)
-			fmt.Print("                                                       \r")
 		}
 		if suggestedCmd == "" || suggestedCmd == cmdStr {
 			suggestedCmd = "ls -la"
@@ -269,15 +264,27 @@ func ExecuteMultiStep(client ollama.LLMProvider, sysCtx *sysinfo.SystemContext, 
 		stepNum := i + 1
 		fmt.Printf("\n%s👉 [%d/%d] %s%s\n", ui.Bold+ui.Yellow, stepNum, len(steps), step, ui.Reset)
 		if !cfg.AutoExecute {
+			ui.ClearInputArea()
+			ui.DrawInputSeparator()
 			ui.DrawLegendAtBottom(t.StepExecuteLegend)
-			fmt.Printf(t.ConfirmStepPrompt, stepNum, len(steps))
-			reader := bufio.NewReader(ui.StdinReader)
-			choice, _ := reader.ReadString('\n')
-			choice = strings.TrimSpace(strings.ToLower(choice))
-			if choice != "" && choice != "y" && choice != "yes" && choice != "sim" && choice != "si" && choice != "s" {
+			ui.MoveToInputLine()
+			fmt.Printf("%s%s%s%s", ui.Bold, ui.Cyan, fmt.Sprintf(t.ConfirmStepPrompt, stepNum, len(steps)), ui.Reset)
+			stepChoice, err := ui.ReadFilteredInput(ui.StdinReader)
+			if err != nil {
+				ui.DrawInputSeparator()
+				ui.MoveToContentStart()
 				fmt.Println(t.OperationCancelled)
 				return false, lastExitCode, lastOutput
 			}
+			choice := strings.TrimSpace(strings.ToLower(stepChoice))
+			if choice != "" && choice != "y" && choice != "yes" && choice != "sim" && choice != "si" && choice != "s" {
+				ui.DrawInputSeparator()
+				ui.MoveToContentStart()
+				fmt.Println(t.OperationCancelled)
+				return false, lastExitCode, lastOutput
+			}
+			ui.DrawInputSeparator()
+			ui.MoveToContentStart()
 		}
 
 		if strings.HasPrefix(strings.TrimSpace(step), "cd ") || strings.TrimSpace(step) == "cd" {
@@ -306,28 +313,29 @@ func ExecuteMultiStep(client ollama.LLMProvider, sysCtx *sysinfo.SystemContext, 
 
 		ec, out, _ := ui.ExecuteCommand(step, t)
 
-		fmt.Printf("%s🔍 %s%s\r", ui.Gray, t.AnalyzingResult, ui.Reset)
+		fmt.Printf("\n%s🔍 %s%s\n", ui.Gray, t.AnalyzingResult, ui.Reset)
 		analysis, errResult := client.AnalyzeExecutionResult(step, ec, out, *sysCtx)
-		fmt.Print("                                                                      \r")
 
 		LogExecution(userQuery, step, "Execute", ec, out, *sysCtx, cfg, client)
 
 		if errResult == nil && analysis.Success {
-			fmt.Printf("%s✔ %s%s\n", ui.Green+ui.Bold, t.Success, ui.Reset)
+			fmt.Printf("\n%s✔ %s%s\n", ui.Green+ui.Bold, t.Success, ui.Reset)
 			if analysis.Reason != "" && analysis.Reason != t.Success && analysis.Reason != "Comando executado com sucesso" && analysis.Reason != "Completed successfully" && analysis.Reason != "Completado con éxito" {
 				fmt.Printf("%s%s%s\n", ui.Gray, analysis.Reason, ui.Reset)
 			}
+			fmt.Println()
 			lastExitCode = ec
 			lastOutput = out
 			continue
 		}
 
-		fmt.Printf("%s✖ %s%s\n", ui.Red+ui.Bold, t.Failed, ui.Reset)
+		fmt.Printf("\n%s✖ %s%s\n", ui.Red+ui.Bold, t.Failed, ui.Reset)
 		if analysis.Reason != "" {
 			fmt.Printf("%s%s%s %s\n", ui.Yellow+ui.Bold, t.Reason, ui.Reset, analysis.Reason)
 		} else {
 			fmt.Printf("%s%s%s %s %d\n", ui.Yellow+ui.Bold, t.Reason, ui.Reset, t.ExitCodeLabel, ec)
 		}
+		fmt.Println()
 		return false, ec, out
 	}
 

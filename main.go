@@ -79,13 +79,12 @@ func main() {
 
 	for {
 		config.AddToHistory(userQuery)
-		fmt.Printf("%s⏳ %s%s\r", ui.Gray, t.ProcessingWithOllama, ui.Reset)
+		fmt.Printf("%s⏳ %s%s\n", ui.Gray, t.ProcessingWithOllama, ui.Reset)
 		cmd, err := client.GenerateCommand(sysCtx, userQuery, cfg.Temperature)
 		if err != nil {
-			fmt.Printf("\n%s%s %v%s\n", ui.Red, t.ErrorPrefix, err, ui.Reset)
+			fmt.Printf("%s%s %v%s\n", ui.Red, t.ErrorPrefix, err, ui.Reset)
 			cli.Exit(1, t)
 		}
-		fmt.Print("                                                                \r")
 
 		if cmd == "" {
 			fmt.Printf("%s%s%s\n", ui.Yellow, t.CommandNoValid, ui.Reset)
@@ -138,9 +137,8 @@ func main() {
 				if err == io.EOF || strings.TrimSpace(feedback) == "" {
 					exitApp(0)
 				}
-				fmt.Printf("%s⏳ %s%s\r", ui.Gray, t.ProcessingWithOllama, ui.Reset)
+				fmt.Printf("%s⏳ %s%s\n", ui.Gray, t.ProcessingWithOllama, ui.Reset)
 				refinedCmd, err := client.GenerateRefinedCommand(sysCtx, userQuery, cmd, feedback, cfg.Temperature)
-				fmt.Print("                                                                \r")
 				switch {
 				case err != nil:
 					fmt.Printf("\n%s%s %v%s\n", ui.Red, t.ErrorPrefix, err, ui.Reset)
@@ -169,6 +167,7 @@ func main() {
 }
 
 func exitApp(code int) {
+	ui.ClearInputArea()
 	ui.ClearLegendAtBottom()
 	os.Exit(code)
 }

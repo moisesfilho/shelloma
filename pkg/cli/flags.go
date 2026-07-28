@@ -81,6 +81,7 @@ func GetOrPromptUserQuery(args []string, t i18n.Translations) string {
 		query, err = ui.ReadLineWithHistory(promptStr, "", history, t)
 		if err != nil || strings.TrimSpace(query) == "" {
 			fmt.Printf("\n%s\n", t.NoInstructionProvided)
+			ui.ClearInputArea()
 			ui.ClearLegendAtBottom()
 			os.Exit(0)
 		}
@@ -89,6 +90,7 @@ func GetOrPromptUserQuery(args []string, t i18n.Translations) string {
 }
 
 func Exit(code int, t i18n.Translations) {
+	ui.ClearInputArea()
 	ui.ClearLegendAtBottom()
 	if IsDesktop {
 		msg := t.PressEnterToExit

@@ -13,7 +13,7 @@ import (
 )
 
 func ExecuteCommand(cmdStr string, t i18n.Translations) (int, string, error) {
-	fmt.Printf("%s%s⚡ %s%s\n\n", Bold, Green, t.Executing, Reset)
+	fmt.Printf("\n%s%s⚡ %s%s\n\n", Bold, Green, t.Executing, Reset)
 
 	var cmd *exec.Cmd
 	if runtime.GOOS == "windows" {

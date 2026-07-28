@@ -40,12 +40,17 @@ func PromptActionWithReader(r io.Reader, t i18n.Translations) Action {
 	legend = strings.TrimSuffix(legend, ": ")
 	legend = strings.TrimSpace(legend)
 
+	ClearInputArea()
+	DrawInputSeparator()
 	DrawLegendAtBottom(legend)
+	MoveToInputLine()
 
-	fmt.Print(t.OptionChoiceLabel)
+	fmt.Printf("%s%s%s%s", Bold, Cyan, t.OptionChoiceLabel, Reset)
 
-	reader := bufio.NewReader(r)
-	input, _ := reader.ReadString('\n')
+	input, err := ReadFilteredInput(r)
+	if err != nil {
+		return ActionQuit
+	}
 	input = strings.TrimSpace(strings.ToLower(input))
 
 	switch input {
@@ -75,24 +80,23 @@ func PromptActionWithReader(r io.Reader, t i18n.Translations) Action {
 
 func EditCommand(currentCmd string, t i18n.Translations) string {
 	fmt.Printf("%s%s%s %s\n", Dim, t.CurrentCommand, Reset, currentCmd)
-	fmt.Printf("%s%s%s ", Bold, t.NewCommand, Reset)
+	fmt.Printf("%s%s%s%s ", Bold, Cyan, t.NewCommand, Reset)
 
-	reader := bufio.NewReader(StdinReader)
-	newCmd, _ := reader.ReadString('\n')
-	newCmd = strings.TrimSpace(newCmd)
-
-	if newCmd == "" {
+	newCmd, err := ReadFilteredInput(StdinReader)
+	if err != nil || strings.TrimSpace(newCmd) == "" {
 		return currentCmd
 	}
-	return newCmd
+	return strings.TrimSpace(newCmd)
 }
 
 func PromptSecurityWord(expectedWord string, t i18n.Translations) bool {
-	fmt.Printf(t.SecurityWordPrompt, expectedWord)
-	reader := bufio.NewReader(StdinReader)
-	input, _ := reader.ReadString('\n')
-	input = strings.TrimSpace(input)
-	return input == expectedWord
+	prompt := fmt.Sprintf(t.SecurityWordPrompt, expectedWord)
+	fmt.Printf("\n%s%s%s%s", Bold, Cyan, prompt, Reset)
+	input, err := ReadFilteredInput(StdinReader)
+	if err != nil {
+		return false
+	}
+	return strings.TrimSpace(input) == expectedWord
 }
 
 func setRawMode(raw bool) error {
@@ -109,6 +113,59 @@ func setRawMode(raw bool) error {
 	return cmd.Run()
 }
 
+func ReadFilteredInput(r io.Reader) (string, error) {
+	if r != os.Stdin {
+		reader := bufio.NewReader(r)
+		s, err := reader.ReadString('\n')
+		if err != nil && err != io.EOF {
+			return "", err
+		}
+		return s, nil
+	}
+	if err := setRawMode(true); err != nil {
+		reader := bufio.NewReader(r)
+		return reader.ReadString('\n')
+	}
+	defer func() { _ = setRawMode(false) }()
+
+	var line []rune
+	reader := bufio.NewReader(os.Stdin)
+	for {
+		r, _, err := reader.ReadRune()
+		if err != nil {
+			return "", err
+		}
+		switch r {
+		case 13, 10:
+			fmt.Print("\r\n")
+			return string(line), nil
+		case 27:
+			if reader.Buffered() == 0 {
+				return "", io.EOF
+			}
+			r2, _, err := reader.ReadRune()
+			if err != nil {
+				return "", io.EOF
+			}
+			if r2 == '[' {
+				_, _, _ = reader.ReadRune()
+				continue
+			}
+			return "", io.EOF
+		case 127, 8:
+			if len(line) > 0 {
+				line = line[:len(line)-1]
+				fmt.Print("\b \b")
+			}
+		default:
+			if r >= 32 {
+				line = append(line, r)
+				fmt.Printf("%c", r)
+			}
+		}
+	}
+}
+
 func renderLine(prompt string, line []rune, cursorPos int) {
 	fmt.Print("\r\x1b[K" + prompt + string(line))
 	if len(line) > cursorPos {
@@ -118,6 +175,9 @@ func renderLine(prompt string, line []rune, cursorPos int) {
 
 func ReadLineWithHistory(prompt string, initialText string, history []string, t i18n.Translations) (string, error) {
 	if err := setRawMode(true); err != nil {
+		ClearInputArea()
+		DrawInputSeparator()
+		MoveToInputLine()
 		fmt.Print(prompt)
 		if initialText != "" {
 			fmt.Print(initialText)
@@ -127,11 +187,21 @@ func ReadLineWithHistory(prompt string, initialText string, history []string, t 
 		if err != nil {
 			return "", err
 		}
-		return initialText + strings.TrimSpace(input), nil
+		DrawInputSeparator()
+		MoveToContentStart()
+		echo := initialText + strings.TrimSpace(input)
+		if echo != "" {
+			DrawContentSeparator()
+			fmt.Printf("\n%s%s\n\n", prompt, echo)
+		}
+		return echo, nil
 	}
 	defer func() { _ = setRawMode(false) }()
 
+	ClearInputArea()
+	DrawInputSeparator()
 	DrawLegendAtBottom(t.InputPromptLegend)
+	MoveToInputLine()
 
 	line := []rune(initialText)
 	cursorPos := len(line)
@@ -149,19 +219,35 @@ func ReadLineWithHistory(prompt string, initialText string, history []string, t 
 		}
 
 		switch r {
-		case 3, 4: // Ctrl+C, Ctrl+D
+		case 3, 4:
+			fmt.Print("\r\n")
+			DrawInputSeparator()
+			MoveToContentStart()
+			DrawContentSeparator()
 			fmt.Print("\r\n")
 			return "", io.EOF
-		case 13, 10: // Enter
+		case 13, 10:
 			fmt.Print("\r\n")
+			DrawInputSeparator()
+			MoveToContentStart()
+			if len(line) > 0 {
+				DrawContentSeparator()
+				fmt.Printf("\r\n%s%s\r\n\r\n", prompt, string(line))
+			}
 			return string(line), nil
-		case 127, 8: // Backspace
+		case 127, 8:
 			if cursorPos > 0 {
 				line = append(line[:cursorPos-1], line[cursorPos:]...)
 				cursorPos--
 				renderLine(prompt, line, cursorPos)
 			}
-		case 27: // Escape sequence
+		case 27:
+			if reader.Buffered() == 0 {
+				fmt.Print("\r\n")
+				DrawInputSeparator()
+				MoveToContentStart()
+				return "", io.EOF
+			}
 			r2, _, err := reader.ReadRune()
 			if err != nil {
 				continue
@@ -172,7 +258,7 @@ func ReadLineWithHistory(prompt string, initialText string, history []string, t 
 					continue
 				}
 				switch r3 {
-				case 'A': // Up
+				case 'A':
 					if len(history) > 0 && historyIndex > 0 {
 						if historyIndex == len(history) {
 							tempInput = make([]rune, len(line))
@@ -183,7 +269,7 @@ func ReadLineWithHistory(prompt string, initialText string, history []string, t 
 						cursorPos = len(line)
 						renderLine(prompt, line, cursorPos)
 					}
-				case 'B': // Down
+				case 'B':
 					if historyIndex < len(history) {
 						historyIndex++
 						if historyIndex == len(history) {
@@ -195,17 +281,17 @@ func ReadLineWithHistory(prompt string, initialText string, history []string, t 
 						cursorPos = len(line)
 						renderLine(prompt, line, cursorPos)
 					}
-				case 'C': // Right
+				case 'C':
 					if cursorPos < len(line) {
 						cursorPos++
 						renderLine(prompt, line, cursorPos)
 					}
-				case 'D': // Left
+				case 'D':
 					if cursorPos > 0 {
 						cursorPos--
 						renderLine(prompt, line, cursorPos)
 					}
-				case '3': // Delete
+				case '3':
 					r4, _, err := reader.ReadRune()
 					if err == nil && r4 == '~' {
 						if cursorPos < len(line) {
@@ -214,7 +300,12 @@ func ReadLineWithHistory(prompt string, initialText string, history []string, t 
 						}
 					}
 				}
+				continue
 			}
+			fmt.Print("\r\n")
+			DrawInputSeparator()
+			MoveToContentStart()
+			return "", io.EOF
 		default:
 			if r >= 32 {
 				line = append(line[:cursorPos], append([]rune{r}, line[cursorPos:]...)...)
@@ -267,7 +358,6 @@ func DrawLegendAtBottom(legend string) {
 		padWidth = 0
 	}
 	paddedLegend := legend + strings.Repeat(" ", padWidth)
-	// \x1b7 (salvar cursor DEC), \x1b8 (restaurar cursor DEC)
 	fmt.Printf("\x1b7\x1b[%d;1H\x1b[2K%s%s%s\x1b8", rows, Inverted, paddedLegend, Reset)
 }
 
@@ -276,22 +366,66 @@ func ClearLegendAtBottom() {
 	fmt.Printf("\x1b7\x1b[%d;1H\x1b[2K\x1b8", rows)
 }
 
+// Input area helpers — the bottom 4 rows are reserved as:
+//   rows-3: separator line
+//   rows-2: prompt / input line
+//   rows-1: gap
+//   rows:   footer legend
+
+func DrawInputSeparator() {
+	rows, cols := getTerminalSize()
+	if rows < 5 {
+		return
+	}
+	sep := strings.Repeat("─", cols-2)
+	fmt.Printf("\x1b7\x1b[%d;1H\x1b[2K%s %s %s\x1b8", rows-3, Gray, sep, Reset)
+}
+
+func DrawContentSeparator() {
+	_, cols := getTerminalSize()
+	sep := strings.Repeat("─", cols-2)
+	fmt.Printf("%s %s %s", Gray, sep, Reset)
+}
+
+func ClearInputArea() {
+	rows, _ := getTerminalSize()
+	if rows < 4 {
+		return
+	}
+	fmt.Printf("\x1b7\x1b[%d;1H\x1b[2K\x1b8", rows-3)
+	fmt.Printf("\x1b7\x1b[%d;1H\x1b[2K\x1b8", rows-2)
+	fmt.Printf("\x1b7\x1b[%d;1H\x1b[2K\x1b8", rows-1)
+}
+
+func MoveToInputLine() {
+	rows, _ := getTerminalSize()
+	if rows < 3 {
+		return
+	}
+	fmt.Printf("\x1b[%d;1H", rows-2)
+}
+
+func MoveToContentStart() {
+	rows, _ := getTerminalSize()
+	if rows > 4 {
+		fmt.Printf("\x1b[%d;1H", rows-4)
+	} else {
+		fmt.Printf("\x1b[10;1H")
+	}
+}
+
 func SetupTerminal(sysCtx sysinfo.SystemContext, model string, version string, t i18n.Translations) {
 	if runtime.GOOS == "windows" {
 		return
 	}
-	// 1. Resetar qualquer região de rolagem anterior
 	fmt.Print("\x1b[r")
 
 	rows, cols := getTerminalSize()
 
-	// 2. Limpar tela e mover cursor para o topo (1;1)
 	fmt.Print("\x1b[2J\x1b[H")
 
-	// 3. Imprimir borda superior do cabeçalho preenchendo toda a largura
 	fmt.Printf("%s┌%s┐%s\n", Gray, strings.Repeat("─", cols-2), Reset)
 
-	// 4. Imprimir cada linha de conteúdo envelopada nas bordas laterais
 	lines := []string{
 		fmt.Sprintf("      /\\                 %sSHELLOMA - CLI ASSISTANT%s", Bold+Cyan, Reset),
 		"     /  \\                ------------------------",
@@ -312,26 +446,27 @@ func SetupTerminal(sysCtx sysinfo.SystemContext, model string, version string, t
 		fmt.Printf("%s│ %s%s │%s\n", Gray, Reset+padded, Gray, Reset)
 	}
 
-	// 5. Imprimir borda inferior do cabeçalho preenchendo toda a largura
 	fmt.Printf("%s└%s┘%s\n", Gray, strings.Repeat("─", cols-2), Reset)
 
-	// Definir margens de rolagem (de 1 a penúltima linha rows-1), deixando o rodapé (linha rows) fixo
+	// Scroll region: 1 to rows-4 (leaving separator at rows-3, input at rows-2, gap at rows-1, footer at rows)
 	scrollStart := 1
-	scrollEnd := rows - 1
+	scrollEnd := rows - 4
 	if scrollEnd <= scrollStart {
-		scrollEnd = rows
+		scrollEnd = rows - 1
 	}
 
 	fmt.Printf("\x1b[%d;%dr", scrollStart, scrollEnd)
-	fmt.Printf("\x1b[10;1H")
+
+	DrawInputSeparator()
+	ClearInputArea()
+	MoveToContentStart()
 }
 
 func ResetTerminal() {
 	if runtime.GOOS == "windows" {
 		return
 	}
-	// 1. Resetar margens de rolagem
 	fmt.Print("\x1b[r")
-	// 2. Limpar a legenda de rodapé
+	ClearInputArea()
 	ClearLegendAtBottom()
 }

@@ -36,5 +36,5 @@ func PrintCommandCard(cmd string) {
 }
 
 func PrintDangerousWarning(matchedCmd string, t i18n.Translations) {
-	fmt.Printf("%s%s⚠️  %s%s\n", Bold, Red, fmt.Sprintf(t.DangerousCommandWarning, matchedCmd), Reset)
+	fmt.Printf("\n%s%s⚠️  %s%s\n", Bold, Red, fmt.Sprintf(t.DangerousCommandWarning, matchedCmd), Reset)
 }
