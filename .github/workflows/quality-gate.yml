@@ -1,0 +1,61 @@
+name: Quality Gate
+
+on:
+  workflow_call:
+
+jobs:
+  quality-gate:
+    name: Lint & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v5
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.23'
+          cache: true
+
+      - name: Verify go.mod integrity
+        run: go mod verify
+
+      - name: Run golangci-lint
+        id: golangci-lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.12.2
+
+      - name: Run Unit Tests
+        id: run-tests
+        run: |
+          set -o pipefail
+          go test -v ./... | tee test_output.txt
+
+      - name: Add Quality Gate Summary
+        if: always()
+        run: |
+          echo "## :shield: Quality Gate Summary" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.golangci-lint.outcome }}" == "success" ]; then
+            echo "- :white_check_mark: **golangci-lint**: 0 problemas identificados" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- :x: **golangci-lint**: Falha no linting" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ "${{ steps.run-tests.outcome }}" == "success" ]; then
+            echo "- :white_check_mark: **Testes Unitarios**: Todos os pacotes validados" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- :x: **Testes Unitarios**: Falha nos testes" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Pacote | Resultado |" >> $GITHUB_STEP_SUMMARY
+          echo "| --- | --- |" >> $GITHUB_STEP_SUMMARY
+          grep -E "^(ok|FAIL)" test_output.txt 2>/dev/null | while read -r line; do
+            pkg=$(echo "$line" | awk '{print $2}')
+            status=$(echo "$line" | awk '{print $1}')
+            duration=$(echo "$line" | awk '{print $3}')
+            if [ "$status" == "ok" ]; then
+              echo "| \`$pkg\` | :white_check_mark: OK ($duration) |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "| \`$pkg\` | :x: FALHOU |" >> $GITHUB_STEP_SUMMARY
+            fi
+          done

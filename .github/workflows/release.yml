@@ -3,15 +3,19 @@ name: Release Pipeline
 on:
   push:
     tags:
-      - '*'
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  release:
-    name: Build & Release Multi-Artifacts
+  quality-gate:
+    uses: ./.github/workflows/quality-gate.yml
+
+  goreleaser:
+    name: Build deb, rpm, tar.gz, snap, binaries
+    needs: quality-gate
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -23,46 +27,15 @@ jobs:
         uses: actions/setup-go@v6
         with:
           go-version: '1.23'
-          cache: false
+          cache: true
 
-      - name: Run golangci-lint
-        id: golangci-lint
-        uses: golangci/golangci-lint-action@v9
-        with:
-          version: v2.12.2
-          skip-cache: true
-
-      - name: Run Unit Tests
-        id: run-tests
-        run: |
-          set -o pipefail
-          go test -v ./... | tee test_output.txt
-
-      - name: Add Quality Gate Summary
-        if: always()
-        run: |
-          echo "## 🛡️ Summary de Qualidade (Quality Gate)" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ steps.golangci-lint.outcome }}" == "success" ]; then
-            echo "- ✅ **golangci-lint**: 0 problemas identificados" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "- ❌ **golangci-lint**: Falha no linting" >> $GITHUB_STEP_SUMMARY
-          fi
-          if [ "${{ steps.run-tests.outcome }}" == "success" ]; then
-            echo "- ✅ **Testes Unitários**: Todos os pacotes validados" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "- ❌ **Testes Unitários**: Falha nos testes" >> $GITHUB_STEP_SUMMARY
-          fi
-
-      - name: Install System Packaging Tools and Dependencies
+      - name: Install System Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y rpm libfuse2 flatpak flatpak-builder python3-pip
-          pip3 install Pillow --break-system-packages
-          sudo snap install snapcraft --classic
-          flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-          flatpak install --user -y flathub org.freedesktop.Platform//23.08 org.freedesktop.Sdk//23.08
+          sudo apt-get install -y rpm python3-pip python3-setuptools
+          pip3 install snapcraft --break-system-packages
 
-      - name: Run GoReleaser (deb, rpm, tar.gz, snap, binaries)
+      - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
@@ -71,17 +44,75 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build AppImage and Flatpak
+  appimage:
+    name: Build AppImage
+    needs: goreleaser
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v5
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.23'
+          cache: true
+
+      - name: Build Go binary
+        run: go build -ldflags="-s -w" -o shelloma .
+
+      - name: Install AppImage dependencies
         run: |
-          chmod +x scripts/build-appimage.sh scripts/build-flatpak.sh
+          sudo apt-get update
+          sudo apt-get install -y libfuse2
+
+      - name: Build AppImage
+        run: |
+          chmod +x scripts/build-appimage.sh
           ./scripts/build-appimage.sh
+
+      - name: Upload AppImage to Release
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          replacesArtifacts: false
+          artifacts: "dist/*.AppImage"
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  flatpak:
+    name: Build Flatpak
+    needs: goreleaser
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v5
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.23'
+          cache: true
+
+      - name: Build Go binary
+        run: go build -ldflags="-s -w" -o shelloma .
+
+      - name: Install Flatpak dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flatpak flatpak-builder python3-pip
+          pip3 install Pillow --break-system-packages
+          flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+          flatpak install --user -y flathub org.freedesktop.Platform//24.08 org.freedesktop.Sdk//24.08
+
+      - name: Build Flatpak
+        run: |
+          chmod +x scripts/build-flatpak.sh
           ./scripts/build-flatpak.sh
 
-      - name: Upload AppImage and Flatpak to GitHub Release
-        uses: softprops/action-gh-release@v3
+      - name: Upload Flatpak to Release
+        uses: ncipollo/release-action@v1
         with:
-          files: |
-            dist/*.AppImage
-            dist/*.flatpak
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          allowUpdates: true
+          replacesArtifacts: false
+          artifacts: "dist/*.flatpak"
+          token: ${{ secrets.GITHUB_TOKEN }}
