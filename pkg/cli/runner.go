@@ -108,7 +108,7 @@ func HandleUserAction(client ollama.LLMProvider, _ sysinfo.SystemContext, cmd *s
 	return action
 }
 
-func ExecuteWithRecovery(client ollama.LLMProvider, sysCtx sysinfo.SystemContext, cmdStr string, cfg config.Config, t i18n.Translations) (bool, int, string) {
+func ExecuteWithRecovery(client ollama.LLMProvider, sysCtx sysinfo.SystemContext, cmdStr string, cfg config.Config, t i18n.Translations, userQuery string) (bool, int, string) {
 	if !cfg.DisableDangerousCheck {
 		if isDanger, _ := config.CheckDangerous(cmdStr, cfg.DangerousCommands); isDanger {
 			if !ui.PromptSecurityWord("CONFIRM", t) {
@@ -141,11 +141,17 @@ func ExecuteWithRecovery(client ollama.LLMProvider, sysCtx sysinfo.SystemContext
 
 	suggestedCmd := analysis.SuggestedCommand
 	if suggestedCmd == "" || suggestedCmd == cmdStr {
-		fmt.Printf("%s⏳ %s%s\r", ui.Gray, t.ProcessingWithOllama, ui.Reset)
-		var fixErr error
-		suggestedCmd, fixErr = client.GenerateFixCommand(sysCtx, cmdStr, output)
-		fmt.Print("                                                       \r")
-		if fixErr != nil || suggestedCmd == "" {
+		if userQuery != "" {
+			fmt.Printf("%s⏳ %s%s\r", ui.Gray, t.RequestingNewApproach, ui.Reset)
+			suggestedCmd, _ = client.GenerateAlternativeCommand(sysCtx, userQuery, cmdStr, output)
+			fmt.Print("                                                       \r")
+		}
+		if suggestedCmd == "" || suggestedCmd == cmdStr {
+			fmt.Printf("%s⏳ %s%s\r", ui.Gray, t.ProcessingWithOllama, ui.Reset)
+			suggestedCmd, _ = client.GenerateFixCommand(sysCtx, cmdStr, output)
+			fmt.Print("                                                       \r")
+		}
+		if suggestedCmd == "" || suggestedCmd == cmdStr {
 			suggestedCmd = "ls -la"
 		}
 	}
@@ -161,24 +167,9 @@ func ExecuteWithRecovery(client ollama.LLMProvider, sysCtx sysinfo.SystemContext
 	for {
 		action := HandleUserAction(client, sysCtx, &suggestedCmd, cfg, t)
 		if action == ui.ActionExecute {
-			fixSuccess, fixExitCode, fixOutput := ExecuteWithRecovery(client, sysCtx, suggestedCmd, cfg, t)
+			fixSuccess, fixExitCode, fixOutput := ExecuteWithRecovery(client, sysCtx, suggestedCmd, cfg, t, userQuery)
 			if fixSuccess {
-				fmt.Printf("\n%s🔄 %s%s\n", ui.Bold+ui.Cyan, t.SuccessFixReturn, ui.Reset)
-				ui.PrintCommandCard(cmdStr)
-				if !cfg.DisableDangerousCheck {
-					if isDanger, matched := config.CheckDangerous(cmdStr, cfg.DangerousCommands); isDanger {
-						ui.PrintDangerousWarning(matched, t)
-					}
-				}
-
-				for {
-					prevAction := HandleUserAction(client, sysCtx, &cmdStr, cfg, t)
-					if prevAction == ui.ActionExecute {
-						return ExecuteWithRecovery(client, sysCtx, cmdStr, cfg, t)
-					} else if prevAction == ui.ActionQuit {
-						return false, fixExitCode, fixOutput
-					}
-				}
+				return true, fixExitCode, fixOutput
 			}
 			return false, fixExitCode, fixOutput
 		} else if action == ui.ActionQuit {
@@ -264,7 +255,7 @@ func handleCdCommand(cmdStr string, sysCtx *sysinfo.SystemContext) error {
 func ExecuteMultiStep(client ollama.LLMProvider, sysCtx *sysinfo.SystemContext, cmdStr string, cfg config.Config, t i18n.Translations, userQuery string) (bool, int, string) {
 	steps := SplitCommandSteps(cmdStr)
 	if len(steps) <= 1 {
-		success, ec, out := ExecuteWithRecovery(client, *sysCtx, cmdStr, cfg, t)
+		success, ec, out := ExecuteWithRecovery(client, *sysCtx, cmdStr, cfg, t, userQuery)
 		LogExecution(userQuery, cmdStr, "Execute", ec, out, *sysCtx, cfg, client)
 		return success, ec, out
 	}
@@ -302,15 +293,41 @@ func ExecuteMultiStep(client ollama.LLMProvider, sysCtx *sysinfo.SystemContext, 
 			continue
 		}
 
-		success, ec, out := ExecuteWithRecovery(client, *sysCtx, step, cfg, t)
+		if !cfg.DisableDangerousCheck {
+			if isDanger, _ := config.CheckDangerous(step, cfg.DangerousCommands); isDanger {
+				if !ui.PromptSecurityWord("CONFIRM", t) {
+					fmt.Printf("%s%s%s\n", ui.Red, t.SecurityWordIncorrect, ui.Reset)
+					LogExecution(userQuery, step, "Execute", 0, "", *sysCtx, cfg, client)
+					return false, 0, ""
+				}
+			}
+		}
+
+		ec, out, _ := ui.ExecuteCommand(step, t)
+
+		fmt.Printf("%s🔍 %s%s\r", ui.Gray, t.AnalyzingResult, ui.Reset)
+		analysis, errResult := client.AnalyzeExecutionResult(step, ec, out, *sysCtx)
+		fmt.Print("                                                                      \r")
+
 		LogExecution(userQuery, step, "Execute", ec, out, *sysCtx, cfg, client)
 
-		lastExitCode = ec
-		lastOutput = out
-
-		if !success {
-			return false, ec, out
+		if errResult == nil && analysis.Success {
+			fmt.Printf("%s✔ %s%s\n", ui.Green+ui.Bold, t.Success, ui.Reset)
+			if analysis.Reason != "" && analysis.Reason != t.Success && analysis.Reason != "Comando executado com sucesso" && analysis.Reason != "Completed successfully" && analysis.Reason != "Completado con éxito" {
+				fmt.Printf("%s%s%s\n", ui.Gray, analysis.Reason, ui.Reset)
+			}
+			lastExitCode = ec
+			lastOutput = out
+			continue
 		}
+
+		fmt.Printf("%s✖ %s%s\n", ui.Red+ui.Bold, t.Failed, ui.Reset)
+		if analysis.Reason != "" {
+			fmt.Printf("%s%s%s %s\n", ui.Yellow+ui.Bold, t.Reason, ui.Reset, analysis.Reason)
+		} else {
+			fmt.Printf("%s%s%s %s %d\n", ui.Yellow+ui.Bold, t.Reason, ui.Reset, t.ExitCodeLabel, ec)
+		}
+		return false, ec, out
 	}
 
 	return true, lastExitCode, lastOutput

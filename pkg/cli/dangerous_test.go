@@ -28,6 +28,10 @@ func (m *mockLLM) GetModel() string {
 	return "mock-model"
 }
 
+func (m *mockLLM) GenerateAlternativeCommand(_ sysinfo.SystemContext, _ string, _ string, _ string) (string, error) {
+	return m.suggestedCmd, nil
+}
+
 func (m *mockLLM) AnalyzeExecutionResult(_ string, exitCode int, _ string, _ sysinfo.SystemContext) (ollama.AnalysisResult, error) {
 	return ollama.AnalysisResult{
 		Success: exitCode == 0,
@@ -81,7 +85,7 @@ func TestDangerousCommandFlow(t *testing.T) {
 	r, w, _ := os.Pipe()
 	os.Stdout = w
 
-	success, _, _ := ExecuteWithRecovery(client, sysCtx, cmdToDelete, cfg, tTrans)
+	success, _, _ := ExecuteWithRecovery(client, sysCtx, cmdToDelete, cfg, tTrans, "")
 
 	w.Close()
 	var buf bytes.Buffer
@@ -110,7 +114,7 @@ func TestDangerousCommandFlow(t *testing.T) {
 	r2, w2, _ := os.Pipe()
 	os.Stdout = w2
 
-	success, _, _ = ExecuteWithRecovery(client, sysCtx, cmdToDelete, cfg, tTrans)
+	success, _, _ = ExecuteWithRecovery(client, sysCtx, cmdToDelete, cfg, tTrans, "")
 
 	w2.Close()
 	var buf2 bytes.Buffer
@@ -146,7 +150,7 @@ func TestDangerousCommandFlow(t *testing.T) {
 	r3, w3, _ := os.Pipe()
 	os.Stdout = w3
 
-	successC, _, _ := ExecuteWithRecovery(client, sysCtx, cmdToDeleteC, cfg, tTrans)
+	successC, _, _ := ExecuteWithRecovery(client, sysCtx, cmdToDeleteC, cfg, tTrans, "")
 
 	w3.Close()
 	var buf3 bytes.Buffer
@@ -197,7 +201,7 @@ func TestDangerousWindowsCommandFlow(t *testing.T) {
 	r, w, _ := os.Pipe()
 	os.Stdout = w
 
-	success, _, _ := ExecuteWithRecovery(client, sysCtx, "Remove-Item -Path C:\\test -Recurse", cfg, tTrans)
+	success, _, _ := ExecuteWithRecovery(client, sysCtx, "Remove-Item -Path C:\\test -Recurse", cfg, tTrans, "")
 
 	w.Close()
 	var buf bytes.Buffer

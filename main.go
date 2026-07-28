@@ -78,10 +78,6 @@ func main() {
 	args = []string{}
 
 	for {
-		if interactiveMode {
-			ui.SetupTerminal(sysCtx, client.GetModel(), version, t)
-			fmt.Printf("%s%s%s %s\n", ui.Bold, ui.Cyan, t.InitialPromptLabel, ui.Reset+userQuery)
-		}
 		config.AddToHistory(userQuery)
 		fmt.Printf("%s⏳ %s%s\r", ui.Gray, t.ProcessingWithOllama, ui.Reset)
 		cmd, err := client.GenerateCommand(sysCtx, userQuery, cfg.Temperature)

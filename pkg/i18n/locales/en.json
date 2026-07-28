@@ -72,5 +72,7 @@
   "header_directory": "Directory ",
   "header_os": "OS        ",
   "header_shell": "Shell     ",
-  "header_model": "Model     "
+  "header_model": "Model     ",
+  "requesting_new_approach": "Command failed. Requesting new approach from Ollama...",
+  "ai_cannot_help": "AI reported it cannot help with this request."
 }

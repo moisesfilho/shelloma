@@ -72,5 +72,7 @@
   "header_directory": "Directorio",
   "header_os": "SO        ",
   "header_shell": "Shell     ",
-  "header_model": "Modelo    "
+  "header_model": "Modelo    ",
+  "requesting_new_approach": "Comando falló. Solicitando nuevo enfoque a Ollama...",
+  "ai_cannot_help": "La IA informó que no puede ayudar con esta solicitud."
 }

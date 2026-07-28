@@ -96,6 +96,9 @@ type Translations struct {
 	HeaderOS        string `json:"header_os"`
 	HeaderShell     string `json:"header_shell"`
 	HeaderModel     string `json:"header_model"`
+
+	RequestingNewApproach string `json:"requesting_new_approach"`
+	AICannotHelp          string `json:"ai_cannot_help"`
 }
 
 var loadedDict = make(map[Language]Translations)
