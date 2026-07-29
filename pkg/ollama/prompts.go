@@ -46,7 +46,39 @@ func cleanCommandOutput(output string) string {
 		}
 	}
 
-	cleaned = strings.TrimPrefix(cleaned, "`")
-	cleaned = strings.TrimSuffix(cleaned, "`")
+	// Remove aspas/crases adicionais que a IA possa ter envolvido o comando inteiro
+	if strings.HasPrefix(cleaned, "`") && strings.HasSuffix(cleaned, "`") {
+		cleaned = strings.TrimPrefix(cleaned, "`")
+		cleaned = strings.TrimSuffix(cleaned, "`")
+	}
+	if strings.HasPrefix(cleaned, "'") && strings.HasSuffix(cleaned, "'") {
+		cleaned = strings.TrimPrefix(cleaned, "'")
+		cleaned = strings.TrimSuffix(cleaned, "'")
+	}
+	if strings.HasPrefix(cleaned, "\"") && strings.HasSuffix(cleaned, "\"") {
+		cleaned = strings.TrimPrefix(cleaned, "\"")
+		cleaned = strings.TrimSuffix(cleaned, "\"")
+	}
+	cleaned = strings.TrimSpace(cleaned)
+
+	// Remove prompts de shell que a IA possa ter colocado no início de cada linha de comando
+	lines := strings.Split(cleaned, "\n")
+	for i, line := range lines {
+		trimmedLine := strings.TrimSpace(line)
+		for {
+			prev := trimmedLine
+			trimmedLine = strings.TrimPrefix(trimmedLine, "$ ")
+			trimmedLine = strings.TrimPrefix(trimmedLine, "# ")
+			trimmedLine = strings.TrimPrefix(trimmedLine, "> ")
+			trimmedLine = strings.TrimPrefix(trimmedLine, "PS ")
+			trimmedLine = strings.TrimSpace(trimmedLine)
+			if trimmedLine == prev {
+				break
+			}
+		}
+		lines[i] = trimmedLine
+	}
+	cleaned = strings.Join(lines, "\n")
+
 	return strings.TrimSpace(cleaned)
 }

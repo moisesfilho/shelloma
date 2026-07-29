@@ -223,11 +223,20 @@ Opções: [Enter/y: Executar] [e: Explicar] [m: Modificar] [c: Copiar] [p: Novo 
 # Exibir as configurações atuais do Shelloma
 shelloma config
 
+# Exibir a documentação compactada das configurações (schema)
+shelloma config docs
+
 # Alterar o idioma padrão salvo (pt, en, es)
 shelloma config set lang pt
 
 # Definir um modelo específico do Ollama
 shelloma config set model qwen2.5-coder:1.5b
+
+# Definir a temperatura de amostragem do modelo (padrão: 0.1)
+shelloma config set temperature 0.5
+
+# Ativar/Desativar execução automática de comandos sem confirmação
+shelloma config set auto_execute true
 
 # Listar os modelos do Ollama instalados na sua máquina
 shelloma models
@@ -235,6 +244,15 @@ shelloma models
 # Abrir os logs de execução da aplicação
 shelloma logs
 ```
+
+### 🤖 Configuração por Linguagem Natural
+
+O Shelloma permite que você solicite atualizações de configuração por meio de linguagem natural! A IA local entende o pedido e gera o comando CLI do Shelloma correspondente para ser executado:
+
+- `shelloma "mude o modelo do shelloma para llama3"` ➔ Sugere: `shelloma config set model llama3`
+- `shelloma "mude o idioma para espanhol"` ➔ Sugere: `shelloma config set lang es`
+- `shelloma "defina a temperatura como 0.8"` ➔ Sugere: `shelloma config set temperature 0.8`
+- `shelloma "ative a execução automática"` ➔ Sugere: `shelloma config set auto_execute true`
 
 ### 📝 Regras Customizadas do Provedor (Rules)
 

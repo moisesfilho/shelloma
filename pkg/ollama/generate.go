@@ -30,13 +30,14 @@ User System Info:
 - Architecture: %s
 
 STRICT RESPONSE RULES:
-1. Respond ONLY with the raw executable command.
-2. DO NOT use markdown code block wrappers like `+"```"+`.
-3. DO NOT add introductions, explanations, greetings, or comments.
-4. When the user asks for multiple sequential actions (e.g. "list then remove", "create then edit", "find then delete"), ALWAYS write each action as a separate command on its own line. DO NOT chain them with pipes (|), &&, or ; into a single line. Each line is executed independently with user confirmation.
-5. Example of what to AVOID: "ls *.txt | xargs rm -f" combines two requests into one dangerous line. Example of what to DO instead: write each step on its own line.
-6. Pipes (|) are acceptable ONLY for filtering/output processing within a single logical operation, NOT for chaining independent sequential tasks.
-7. Adapt commands specifically for system %s / shell %s.`,
+1. Output ONLY the raw executable command. Absolutely no other text.
+2. DO NOT wrap the command in markdown code blocks or quotes (e.g., no `+"```"+` or backticks).
+3. DO NOT add introductions, explanations, notes, greetings, or warnings.
+4. DO NOT add shell comments (e.g., lines starting with #, //, ::, rem) or inline comments to the command. The output must be pure executable code.
+5. DO NOT prefix the command with shell prompts (like "$ ", "# ", "> ", "PS ").
+6. When the user asks for multiple sequential actions (e.g. "list then remove", "create then edit", "find then delete"), ALWAYS write each action as a separate command on its own line. DO NOT chain them with pipes (|), &&, or ; into a single line. Each line is executed independently with user confirmation.
+7. Pipes (|) are acceptable ONLY for filtering/output processing within a single logical operation, NOT for chaining independent sequential tasks.
+8. Adapt commands specifically for system %s / shell %s.`,
 		osPersona,
 		sysCtx.OS, sysCtx.DistroName, sysCtx.DistroVer,
 		sysCtx.Shell,
@@ -127,9 +128,10 @@ A command failed to execute on (%s %s, shell %s).
 Your goal is to generate a NEW valid executable command to fix the issue, create missing files/folders, or investigate the cause.
 
 RULES:
-1. Respond ONLY with the raw executable command.
-2. DO NOT use markdown code block formatting.
-3. DO NOT add explanatory text or sentences.`, sysCtx.DistroName, sysCtx.DistroVer, sysCtx.Shell)
+1. Output ONLY the raw executable command. Absolutely no other text.
+2. DO NOT wrap the command in markdown code blocks or quotes.
+3. DO NOT add explanatory text, sentences, warnings, or notes.
+4. DO NOT add shell prompts or inline/trailing comments (like # or ::).`, sysCtx.DistroName, sysCtx.DistroVer, sysCtx.Shell)
 
 	prompt := fmt.Sprintf("Failed Command: %s\nError Output:\n%s", failedCmd, errorOutput)
 
@@ -182,9 +184,10 @@ IMPORTANT INSTRUCTIONS:
 1. Suggest a COMPLETELY DIFFERENT command or approach to accomplish the user's original goal.
 2. Do NOT suggest the same command that failed.
 3. If you cannot think of a different approach or cannot help with this request, respond with exactly: I_CANNOT_HELP
-4. Respond ONLY with the raw executable command (or "I_CANNOT_HELP").
-5. DO NOT use markdown code block formatting.
-6. DO NOT add explanatory text or sentences.`, osPersona)
+4. Output ONLY the raw executable command (or "I_CANNOT_HELP"). Absolutely no other text.
+5. DO NOT wrap the command in markdown code blocks or quotes.
+6. DO NOT add explanatory text, sentences, warnings, notes, or comments (like # or ::).
+7. DO NOT prefix the command with shell prompts (like $ or PS).`, osPersona)
 
 	prompt := fmt.Sprintf(`Original user request: %s
 
@@ -255,13 +258,14 @@ User System Info:
 - Architecture: %s
 
 STRICT RESPONSE RULES:
-1. Respond ONLY with the raw executable command.
-2. DO NOT use markdown code block wrappers like `+"```"+`.
-3. DO NOT add introductions, explanations, greetings, or comments.
-4. When the user asks for multiple sequential actions (e.g. "list then remove", "create then edit", "find then delete"), ALWAYS write each action as a separate command on its own line. DO NOT chain them with pipes (|), &&, or ; into a single line. Each line is executed independently with user confirmation.
-5. Example of what to AVOID: "ls *.txt | xargs rm -f" combines two requests into one dangerous line. Example of what to DO instead: write each step on its own line.
-6. Pipes (|) are acceptable ONLY for filtering/output processing within a single logical operation, NOT for chaining independent sequential tasks.
-7. Adapt commands specifically for system %s / shell %s.`,
+1. Output ONLY the raw executable command. Absolutely no other text.
+2. DO NOT wrap the command in markdown code blocks or quotes (e.g., no `+"```"+` or backticks).
+3. DO NOT add introductions, explanations, notes, greetings, or warnings.
+4. DO NOT add shell comments (e.g., lines starting with #, //, ::, rem) or inline comments to the command. The output must be pure executable code.
+5. DO NOT prefix the command with shell prompts (like "$ ", "# ", "> ", "PS ").
+6. When the user asks for multiple sequential actions (e.g. "list then remove", "create then edit", "find then delete"), ALWAYS write each action as a separate command on its own line. DO NOT chain them with pipes (|), &&, or ; into a single line. Each line is executed independently with user confirmation.
+7. Pipes (|) are acceptable ONLY for filtering/output processing within a single logical operation, NOT for chaining independent sequential tasks.
+8. Adapt commands specifically for system %s / shell %s.`,
 		osPersona,
 		sysCtx.OS, sysCtx.DistroName, sysCtx.DistroVer,
 		sysCtx.Shell,

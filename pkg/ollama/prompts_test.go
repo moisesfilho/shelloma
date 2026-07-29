@@ -13,6 +13,14 @@ func TestCleanCommandOutput(t *testing.T) {
 		{"`ls -la`", "ls -la"},
 		{"  mkdir -p /tmp/test  \n", "mkdir -p /tmp/test"},
 		{"```\necho hello\n```", "echo hello"},
+		{"'ls -la'", "ls -la"},
+		{"\"mkdir foo\"", "mkdir foo"},
+		{"$ ls -l", "ls -l"},
+		{"# apt update", "apt update"},
+		{"> echo test", "echo test"},
+		{"PS > Get-Process", "Get-Process"},
+		{"PS Get-Service", "Get-Service"},
+		{"$ $ ls -lh", "ls -lh"},
 	}
 
 	for _, tt := range tests {

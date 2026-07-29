@@ -223,11 +223,20 @@ Options: [Enter/y: Execute] [e: Explain] [m: Modify] [c: Copy] [p: New Prompt] [
 # Display current configuration
 shelloma config
 
+# Display the compact configuration schema
+shelloma config docs
+
 # Change default saved language (en, pt, es)
 shelloma config set lang en
 
 # Set a specific Ollama model
 shelloma config set model qwen2.5-coder:1.5b
+
+# Set model sampling temperature (default: 0.1)
+shelloma config set temperature 0.5
+
+# Enable/Disable automatic command execution without confirmation
+shelloma config set auto_execute true
 
 # List installed Ollama models
 shelloma models
@@ -235,6 +244,15 @@ shelloma models
 # Open application execution logs
 shelloma logs
 ```
+
+### 🤖 Natural Language Configuration
+
+Shelloma allows you to request configuration updates using natural language! The local AI parses the request and generates the matching Shelloma CLI command to be executed:
+
+- `shelloma "change shelloma model to llama3"` ➔ Suggests: `shelloma config set model llama3`
+- `shelloma "set language to spanish"` ➔ Suggests: `shelloma config set lang es`
+- `shelloma "set temperature to 0.8"` ➔ Suggests: `shelloma config set temperature 0.8`
+- `shelloma "enable auto execution"` ➔ Suggests: `shelloma config set auto_execute true`
 
 ### 📝 Custom Translation Rules
 
