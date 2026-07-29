@@ -48,6 +48,7 @@ func SetupFlags(modelFlag, urlFlag, langFlag *string, yesFlag, verFlag, desktopF
 		fmt.Println(t.HelpCommands)
 		fmt.Println("  shelloma models          List installed Ollama models")
 		fmt.Println("  shelloma config          Show current configuration")
+		fmt.Println("  shelloma config docs     Show compact configuration schema & commands")
 		fmt.Println("  shelloma config set model <model_name>")
 		fmt.Println("  shelloma config set lang <en|pt|es>")
 		fmt.Println()

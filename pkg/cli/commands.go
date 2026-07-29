@@ -35,6 +35,11 @@ func HandleModelsCommand(cfg config.Config, t i18n.Translations) {
 }
 
 func HandleConfigCommand(cfg config.Config, args []string, t i18n.Translations) {
+	if len(args) >= 1 && (args[0] == "docs" || args[0] == "schema") {
+		fmt.Println(config.GetConfigSchema())
+		return
+	}
+
 	if len(args) >= 3 && args[0] == "set" {
 		key := strings.ToLower(args[1])
 		val := args[2]
@@ -55,6 +60,15 @@ func HandleConfigCommand(cfg config.Config, args []string, t i18n.Translations) 
 			cfg.DangerousCommands = commands
 		case "disable_dangerous_check":
 			cfg.DisableDangerousCheck = val == "true" || val == "1" || val == "yes"
+		case "temperature", "temp":
+			temp, err := strconv.ParseFloat(val, 64)
+			if err != nil {
+				fmt.Printf("%s%s %v%s\n", ui.Red, t.ErrorPrefix, err, ui.Reset)
+				os.Exit(1)
+			}
+			cfg.Temperature = temp
+		case "auto_execute", "auto":
+			cfg.AutoExecute = val == "true" || val == "1" || val == "yes" || val == "on"
 		default:
 			fmt.Printf("%s%s: %s%s\n", ui.Red, t.UnknownKey, key, ui.Reset)
 			os.Exit(1)

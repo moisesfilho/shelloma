@@ -85,7 +85,7 @@ func TestTerminalSetupResetAndDraw(t *testing.T) {
 	}
 	trans := i18n.GetTranslations("pt")
 
-	SetupTerminal(sysCtx, "qwen2.5-coder:1.5b", "1.3.0", trans)
+	SetupTerminal(sysCtx, "qwen2.5-coder:1.5b", "1.4.0", trans)
 	DrawLegendAtBottom("Test Legend")
 	ClearLegendAtBottom()
 	ResetTerminal()

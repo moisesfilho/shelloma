@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -101,6 +102,26 @@ func TestCheckDangerous(t *testing.T) {
 		}
 		if matched != tt.matched {
 			t.Errorf("CheckDangerous(%q) matched %q, expected %q", tt.cmd, matched, tt.matched)
+		}
+	}
+}
+
+func TestGetConfigSchema(t *testing.T) {
+	schema := GetConfigSchema()
+	expectedKeywords := []string{
+		"ollama_url",
+		"model",
+		"language",
+		"temperature",
+		"auto_execute",
+		"disable_dangerous_check",
+		"dangerous_commands",
+		"rules",
+	}
+
+	for _, kw := range expectedKeywords {
+		if !strings.Contains(schema, kw) {
+			t.Errorf("Esperava que o schema de configuração contivesse a palavra-chave %q", kw)
 		}
 	}
 }

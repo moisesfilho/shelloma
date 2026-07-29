@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strings"
 
+	"shelloma/pkg/config"
 	"shelloma/pkg/sysinfo"
 )
 
@@ -44,6 +45,8 @@ STRICT RESPONSE RULES:
 		sysCtx.Arch,
 		sysCtx.DistroName, sysCtx.Shell,
 	)
+
+	systemPrompt += "\n\n" + config.GetConfigSchema()
 
 	if len(c.Rules) > 0 {
 		systemPrompt += "\n\nCustom User Preferences / Rules:\n"
@@ -267,6 +270,8 @@ STRICT RESPONSE RULES:
 		sysCtx.Arch,
 		sysCtx.DistroName, sysCtx.Shell,
 	)
+
+	systemPrompt += "\n\n" + config.GetConfigSchema()
 
 	if len(c.Rules) > 0 {
 		systemPrompt += "\n\nCustom User Preferences / Rules:\n"

@@ -91,6 +91,18 @@ func TestHandleConfigCommand(t *testing.T) {
 		if !newCfg.DisableDangerousCheck {
 			t.Errorf("DisableDangerousCheck deveria ser true")
 		}
+
+		HandleConfigCommand(newCfg, []string{"set", "temperature", "0.85"}, trans)
+		newCfg, _ = config.LoadConfig()
+		if newCfg.Temperature != 0.85 {
+			t.Errorf("Temperatura salva incorreta: %f", newCfg.Temperature)
+		}
+
+		HandleConfigCommand(newCfg, []string{"set", "auto_execute", "true"}, trans)
+		newCfg, _ = config.LoadConfig()
+		if !newCfg.AutoExecute {
+			t.Errorf("AutoExecute deveria ser true")
+		}
 	})
 
 	// 3. Test Show Config
@@ -110,6 +122,25 @@ func TestHandleConfigCommand(t *testing.T) {
 
 		if !strings.Contains(out, "ollama_url") || !strings.Contains(out, "model") {
 			t.Errorf("Esperava detalhes da configuração impressos, obteve %q", out)
+		}
+	})
+
+	// 4. Test Config Docs
+	t.Run("Config Docs Subcommand", func(t *testing.T) {
+		oldStdout := os.Stdout
+		r, w, _ := os.Pipe()
+		os.Stdout = w
+
+		HandleConfigCommand(cfg, []string{"docs"}, trans)
+
+		w.Close()
+		var buf bytes.Buffer
+		_, _ = io.Copy(&buf, r)
+		os.Stdout = oldStdout
+		out := buf.String()
+
+		if !strings.Contains(out, "Shelloma Configuration Schema & Commands") {
+			t.Errorf("Esperava documentação compactada, obteve %q", out)
 		}
 	})
 }

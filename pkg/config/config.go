@@ -156,3 +156,20 @@ func CheckDangerous(cmd string, dangerousList []string) (bool, string) {
 	}
 	return false, ""
 }
+
+// GetConfigSchema retorna uma documentação compactada das configurações e comandos do Shelloma.
+func GetConfigSchema() string {
+	return `Shelloma Configuration Schema & Commands:
+- ollama_url: URL for Ollama API (string, default: http://localhost:11434). Command: shelloma config set url <value>
+- model: Ollama LLM model name (string, auto-detected if empty). Command: shelloma config set model <value>
+- language: UI & translation language (en|pt|es, default: en). Command: shelloma config set lang <value>
+- temperature: Sampling temperature (float, default: 0.1). Command: shelloma config set temperature <value>
+- auto_execute: Run commands automatically (bool, default: false). Command: shelloma config set auto_execute <true|false>
+- disable_dangerous_check: Disable security warning for dangerous commands (bool, default: false). Command: shelloma config set disable_dangerous_check <true|false>
+- dangerous_commands: List of dangerous commands to block/warn (comma-separated). Command: shelloma config set dangerous <cmd1,cmd2>
+- rules: Custom system rules for Ollama prompts (array of strings). Commands:
+  * Add rule: shelloma rules add <rule_text>
+  * List rules: shelloma rules list
+  * Edit rule: shelloma rules edit <index> <new_text>
+  * Delete rule: shelloma rules delete <index>`
+}
