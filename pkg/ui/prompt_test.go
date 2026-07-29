@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -89,3 +90,78 @@ func TestTerminalSetupResetAndDraw(t *testing.T) {
 	ClearLegendAtBottom()
 	ResetTerminal()
 }
+
+func TestEditCommand(t *testing.T) {
+	trans := i18n.GetTranslations("en")
+
+	// 1. User enters new command
+	{
+		oldStdin := StdinReader
+		StdinReader = strings.NewReader("mkdir -p /tmp/new_test_dir\n")
+		defer func() { StdinReader = oldStdin }()
+
+		cmd := EditCommand("ls -la", trans)
+		if cmd != "mkdir -p /tmp/new_test_dir" {
+			t.Errorf("Esperava 'mkdir -p /tmp/new_test_dir', obteve %q", cmd)
+		}
+	}
+
+	// 2. User enters empty line (should return current/original command)
+	{
+		oldStdin := StdinReader
+		StdinReader = strings.NewReader("\n")
+		defer func() { StdinReader = oldStdin }()
+
+		cmd := EditCommand("ls -la", trans)
+		if cmd != "ls -la" {
+			t.Errorf("Esperava retorno do comando original 'ls -la', obteve %q", cmd)
+		}
+	}
+}
+
+func TestPromptSecurityWord(t *testing.T) {
+	trans := i18n.GetTranslations("en")
+
+	// 1. User enters correct word
+	{
+		oldStdin := StdinReader
+		StdinReader = strings.NewReader("CONFIRM\n")
+		defer func() { StdinReader = oldStdin }()
+
+		success := PromptSecurityWord("CONFIRM", trans)
+		if !success {
+			t.Errorf("Esperava que a palavra de segurança CONFIRM fosse considerada correta")
+		}
+	}
+
+	// 2. User enters incorrect word
+	{
+		oldStdin := StdinReader
+		StdinReader = strings.NewReader("INCORRECT\n")
+		defer func() { StdinReader = oldStdin }()
+
+		success := PromptSecurityWord("CONFIRM", trans)
+		if success {
+			t.Errorf("Esperava que a palavra incorreta falhasse")
+		}
+	}
+}
+
+type errorReader struct{}
+
+func (errorReader) Read(_ []byte) (n int, err error) {
+	return 0, fmt.Errorf("simulated read error")
+}
+
+func TestReadFilteredInputError(t *testing.T) {
+	reader := errorReader{}
+	input, err := ReadFilteredInput(reader)
+	if err == nil {
+		t.Errorf("Esperava erro ao ler do reader com erro, obteve input: %q", input)
+	}
+	if !strings.Contains(err.Error(), "simulated read error") {
+		t.Errorf("Erro inesperado: %v", err)
+	}
+}
+
+
