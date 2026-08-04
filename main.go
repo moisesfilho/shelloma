@@ -61,14 +61,17 @@ func main() {
 		case "rules":
 			cli.HandleRulesCommand(cfg, args[1:], t)
 			return
+		case "learn", "aprender":
+			cli.HandleLearnCommand(cfg, args[1:], t)
+			return
 		}
 	}
 
+	ui.IsTerminalApp = len(args) == 0 || cli.IsDesktop
 	sysCtx := sysinfo.GetSystemContext()
 
 	client := cli.ConnectOrRecoverOllama(cfg, t)
-	interactiveMode := len(args) == 0 || cli.IsDesktop
-	if interactiveMode {
+	if ui.IsTerminalApp {
 		ui.SetupTerminal(sysCtx, client.GetModel(), version, t)
 	} else {
 		ui.PrintBanner(client.GetModel(), string(i18n.NormalizeLanguage(cfg.Language)))
@@ -112,6 +115,12 @@ func main() {
 			switch action {
 			case ui.ActionExecute:
 				success, _, _ := cli.ExecuteMultiStep(client, &sysCtx, cmd, cfg, t, userQuery)
+				if !ui.IsTerminalApp {
+					if success {
+						exitApp(0)
+					}
+					exitApp(1)
+				}
 				history, _ := config.LoadHistory()
 				ans, err := ui.ReadLineWithHistory(fmt.Sprintf("%s%s%s%s", ui.Bold, ui.Cyan, t.AnythingElsePrompt, ui.Reset), "", history, t)
 				if err == io.EOF || strings.TrimSpace(ans) == "" {

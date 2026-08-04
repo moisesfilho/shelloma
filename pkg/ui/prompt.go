@@ -28,6 +28,8 @@ const (
 
 var StdinReader io.Reader = os.Stdin
 
+var IsTerminalApp = true
+
 func PromptAction(t i18n.Translations) Action {
 	return PromptActionWithReader(StdinReader, t)
 }
@@ -46,6 +48,9 @@ func PromptActionWithReader(r io.Reader, t i18n.Translations) Action {
 	MoveToInputLine()
 
 	fmt.Printf("%s%s%s%s", Bold, Cyan, t.OptionChoiceLabel, Reset)
+	if !IsTerminalApp {
+		fmt.Printf("\n%s%s%s", Dim, legend, Reset)
+	}
 
 	input, err := ReadFilteredInput(r)
 	if err != nil {
@@ -351,6 +356,9 @@ func getTerminalSize() (int, int) {
 }
 
 func DrawLegendAtBottom(legend string) {
+	if !IsTerminalApp {
+		return
+	}
 	rows, cols := getTerminalSize()
 	visLen := len([]rune(stripANSI(legend)))
 	padWidth := cols - visLen
@@ -362,6 +370,9 @@ func DrawLegendAtBottom(legend string) {
 }
 
 func ClearLegendAtBottom() {
+	if !IsTerminalApp {
+		return
+	}
 	rows, _ := getTerminalSize()
 	fmt.Printf("\x1b7\x1b[%d;1H\x1b[2K\x1b8", rows)
 }
@@ -373,6 +384,9 @@ func ClearLegendAtBottom() {
 //   rows:   footer legend
 
 func DrawInputSeparator() {
+	if !IsTerminalApp {
+		return
+	}
 	rows, cols := getTerminalSize()
 	if rows < 5 {
 		return
@@ -382,12 +396,18 @@ func DrawInputSeparator() {
 }
 
 func DrawContentSeparator() {
+	if !IsTerminalApp {
+		return
+	}
 	_, cols := getTerminalSize()
 	sep := strings.Repeat("─", cols-2)
 	fmt.Printf("%s %s %s", Gray, sep, Reset)
 }
 
 func ClearInputArea() {
+	if !IsTerminalApp {
+		return
+	}
 	rows, _ := getTerminalSize()
 	if rows < 4 {
 		return
@@ -398,6 +418,9 @@ func ClearInputArea() {
 }
 
 func MoveToInputLine() {
+	if !IsTerminalApp {
+		return
+	}
 	rows, _ := getTerminalSize()
 	if rows < 3 {
 		return
@@ -406,6 +429,9 @@ func MoveToInputLine() {
 }
 
 func MoveToContentStart() {
+	if !IsTerminalApp {
+		return
+	}
 	rows, _ := getTerminalSize()
 	if rows > 4 {
 		fmt.Printf("\x1b[%d;1H", rows-4)

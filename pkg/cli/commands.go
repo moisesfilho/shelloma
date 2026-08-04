@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -353,4 +354,68 @@ func readLine() string {
 		}
 	}
 	return strings.TrimSpace(string(buf))
+}
+
+func HandleLearnCommand(_ config.Config, args []string, t i18n.Translations) {
+	if len(args) == 0 {
+		fmt.Println(t.LearnUsage)
+		return
+	}
+
+	commandName := args[0]
+	_, err := exec.LookPath(commandName)
+	if err != nil {
+		fmt.Printf("%s"+t.LearnCmdNotFound+"%s\n", ui.Red, commandName, ui.Reset)
+		os.Exit(1)
+	}
+
+	fmt.Printf(t.LearningStart+"\n", commandName)
+
+	helpText, err := runHelpCommand(commandName)
+	if err != nil {
+		fmt.Printf("%s"+t.LearnFailed+"%s\n", ui.Red, commandName, err, ui.Reset)
+		os.Exit(1)
+	}
+
+	err = config.SaveLearnedCommand(commandName, helpText)
+	if err != nil {
+		fmt.Printf("%s"+t.LearnFailed+"%s\n", ui.Red, commandName, err, ui.Reset)
+		os.Exit(1)
+	}
+
+	fmt.Printf("%s"+t.LearnSuccess+"%s\n", ui.Green, commandName, ui.Reset)
+}
+
+func runHelpCommand(commandName string) (string, error) {
+	cmd := exec.Command(commandName, "--help")
+	cmd.Env = append(os.Environ(), "PAGER=cat", "MANPAGER=cat")
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &out
+	err := cmd.Run()
+	if err == nil && out.Len() > 0 {
+		return out.String(), nil
+	}
+
+	cmdH := exec.Command(commandName, "-h")
+	cmdH.Env = append(os.Environ(), "PAGER=cat", "MANPAGER=cat")
+	var outH bytes.Buffer
+	cmdH.Stdout = &outH
+	cmdH.Stderr = &outH
+	errH := cmdH.Run()
+	if errH == nil && outH.Len() > 0 {
+		return outH.String(), nil
+	}
+
+	if out.Len() > 0 {
+		return out.String(), nil
+	}
+	if outH.Len() > 0 {
+		return outH.String(), nil
+	}
+
+	if err != nil {
+		return "", err
+	}
+	return "", fmt.Errorf("no output from help command")
 }

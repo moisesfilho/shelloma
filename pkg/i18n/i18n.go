@@ -100,6 +100,11 @@ type Translations struct {
 	RequestingNewApproach string `json:"requesting_new_approach"`
 	AICannotHelp          string `json:"ai_cannot_help"`
 	StepExecuteLegend     string `json:"step_execute_legend"`
+	LearnUsage            string `json:"learn_usage"`
+	LearnCmdNotFound      string `json:"learn_cmd_not_found"`
+	LearningStart         string `json:"learning_start"`
+	LearnSuccess          string `json:"learn_success"`
+	LearnFailed           string `json:"learn_failed"`
 }
 
 var loadedDict = make(map[Language]Translations)

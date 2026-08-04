@@ -39,6 +39,7 @@
 - 📦 **Distribución Multiplataforma**: Ejecutables para Windows (`.exe`), macOS y Linux (`.deb`, `.rpm`, Snap, AppImage, Flatpak). Incluye integración nativa con el escritorio Linux (generando un lanzador `.desktop` y registrando el icono oficial en formato SVG).
 - ⛓️ **Ejecución de Múltiples Etapas**: Ejecuta secuencias de comandos de múltiples etapas paso a paso con confirmaciones y registra cada etapa.
 - 📝 **Completion de Bash**: Scripts de autocompletado para shell incluidos en paquetes Debian/Ubuntu.
+- 🧠 **Aprendizaje de Comandos**: Enseña un comando CLI a Shelloma localmente con `shelloma learn <cmd>` (alias `aprender`). La ayuda aprendida se guarda en tu equipo y se inyecta automáticamente en el prompt siempre que se mencione ese comando.
 
 ---
 
@@ -199,6 +200,8 @@ shelloma -l en "list all active docker containers"
 shelloma -l pt "listar todos os arquivos da pasta atual"
 ```
 
+Pasar una instrucción directamente ejecuta Shelloma en **modo de una sola ejecución**: sugiere, ejecuta y sale — sin el prompt de continuación del bucle. Ejecuta `shelloma` sin argumentos para usar la app interactiva completa.
+
 ### Menú Interactivo en CLI
 
 Al generar un comando, Shelloma mostrará la tarjeta y esperará tu elección:
@@ -272,6 +275,18 @@ shelloma rules edit 1 "Siempre abrir imágenes con feh"
 # Eliminar una regla guardada por índice
 shelloma rules delete 1
 ```
+
+### 🧠 Aprendizaje de Comandos Personalizados
+
+Shelloma puede aprender cualquier comando CLI disponible en tu equipo para que las futuras solicitudes que lo involucren se respondan con las opciones reales del comando:
+
+```bash
+# Aprender las opciones de un comando localmente (alias: aprender)
+shelloma learn git
+shelloma aprender git
+```
+
+Los comandos aprendidos se guardan localmente en `~/.config/shelloma/learned/<comando>.json`. Cuando mencionas un comando aprendido en tu solicitud, la referencia de ayuda se inyecta automáticamente en el prompt para que el modelo genere comandos precisos.
 
 ### 📋 Registro de Ejecución (Logs)
 

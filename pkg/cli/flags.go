@@ -51,6 +51,8 @@ func SetupFlags(modelFlag, urlFlag, langFlag *string, yesFlag, verFlag, desktopF
 		fmt.Println("  shelloma config docs     Show compact configuration schema & commands")
 		fmt.Println("  shelloma config set model <model_name>")
 		fmt.Println("  shelloma config set lang <en|pt|es>")
+		fmt.Println("  shelloma rules           Manage custom rules for prompt generation")
+		fmt.Println("  shelloma learn <cmd>     Learn and save a CLI command options locally (alias: aprender)")
 		fmt.Println()
 		fmt.Println(t.HelpOptions)
 		flag.PrintDefaults()
