@@ -75,5 +75,10 @@
   "header_shell": "Shell     ",
   "header_model": "Modelo    ",
   "requesting_new_approach": "Comando falló. Solicitando nuevo enfoque a Ollama...",
-  "ai_cannot_help": "La IA informó que no puede ayudar con esta solicitud."
+  "ai_cannot_help": "La IA informó que no puede ayudar con esta solicitud.",
+  "learn_usage": "Uso: shelloma learn <comando>",
+  "learn_cmd_not_found": "Comando \"%s\" no encontrado en el sistema.",
+  "learning_start": "🔍 Obteniendo ayuda para el comando \"%s\"...",
+  "learn_success": "✔ ¡Comando \"%s\" aprendido y guardado con éxito localmente!",
+  "learn_failed": "✖ Error al intentar obtener ayuda para el comando \"%s\": %v"
 }

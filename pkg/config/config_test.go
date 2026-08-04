@@ -125,3 +125,38 @@ func TestGetConfigSchema(t *testing.T) {
 		}
 	}
 }
+
+func TestLearningCommand(t *testing.T) {
+	tempDir, err := os.MkdirTemp("", "shelloma_test_learning")
+	if err != nil {
+		t.Fatalf("Erro ao criar diretório temporário: %v", err)
+	}
+	defer os.RemoveAll(tempDir)
+
+	t.Setenv("HOME", tempDir)
+	t.Setenv("XDG_CONFIG_HOME", filepath.Join(tempDir, ".config"))
+	t.Setenv("AppData", filepath.Join(tempDir, "AppData", "Roaming"))
+
+	err = SaveLearnedCommand("custom-cmd", "this is a custom command help output")
+	if err != nil {
+		t.Fatalf("Erro ao salvar comando aprendido: %v", err)
+	}
+
+	learnedFile := filepath.Join(tempDir, ".config", "shelloma", "learned", "custom-cmd.json")
+	if _, err := os.Stat(learnedFile); os.IsNotExist(err) {
+		t.Fatalf("Arquivo JSON do comando aprendido não foi criado em %s", learnedFile)
+	}
+
+	list, err := LoadLearnedCommands()
+	if err != nil {
+		t.Fatalf("Erro ao carregar comandos aprendidos: %v", err)
+	}
+
+	if len(list) != 1 {
+		t.Fatalf("Esperava 1 comando aprendido, obteve %d", len(list))
+	}
+
+	if list[0].Command != "custom-cmd" || list[0].Help != "this is a custom command help output" {
+		t.Errorf("Dados carregados incorretos: %+v", list[0])
+	}
+}

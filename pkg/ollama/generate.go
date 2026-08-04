@@ -56,6 +56,19 @@ STRICT RESPONSE RULES:
 		}
 	}
 
+	learnedCmds, err := config.LoadLearnedCommands()
+	if err == nil && len(learnedCmds) > 0 {
+		var contextHelp []string
+		for _, lc := range learnedCmds {
+			if containsWord(userPrompt, lc.Command) {
+				contextHelp = append(contextHelp, fmt.Sprintf("Help and options for command '%s':\n%s", lc.Command, lc.Help))
+			}
+		}
+		if len(contextHelp) > 0 {
+			systemPrompt += "\n\nAdditional learned command reference that the user installed on their machine:\n" + strings.Join(contextHelp, "\n\n")
+		}
+	}
+
 	reqBody := GenerateRequest{
 		Model:  c.Model,
 		Prompt: userPrompt,
@@ -327,5 +340,31 @@ Please generate a revised terminal command that satisfies the original request w
 
 	cmd := cleanCommandOutput(genResp.Response)
 	return cmd, nil
+}
+
+func containsWord(s, word string) bool {
+	s = strings.ToLower(s)
+	word = strings.ToLower(word)
+	if !strings.Contains(s, word) {
+		return false
+	}
+	index := strings.Index(s, word)
+	for index != -1 {
+		startOK := index == 0 || isSeparator(s[index-1])
+		endOK := index+len(word) == len(s) || isSeparator(s[index+len(word)])
+		if startOK && endOK {
+			return true
+		}
+		nextIndex := strings.Index(s[index+1:], word)
+		if nextIndex == -1 {
+			break
+		}
+		index = index + 1 + nextIndex
+	}
+	return false
+}
+
+func isSeparator(r byte) bool {
+	return r == ' ' || r == '\t' || r == '\n' || r == '\r' || r == ',' || r == '.' || r == ';' || r == ':' || r == '(' || r == ')' || r == '[' || r == ']' || r == '"' || r == '\'' || r == '`'
 }
 

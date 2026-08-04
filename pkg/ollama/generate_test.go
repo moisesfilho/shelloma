@@ -262,3 +262,29 @@ func TestGenerateRefinedCommand(t *testing.T) {
 	}
 }
 
+func TestContainsWord(t *testing.T) {
+	tests := []struct {
+		s      string
+		word   string
+		expect bool
+	}{
+		{"listar arquivos usando git", "git", true},
+		{"listar arquivos usando git-cli", "git", false},
+		{"git clonar repositorio", "git", true},
+		{"ferramenta especial git.", "git", true},
+		{"ferramenta especial git,", "git", true},
+		{"ferramenta especial (git)", "git", true},
+		{"ferramenta especial [git]", "git", true},
+		{"usando github", "git", false},
+		{"usando digit", "git", false},
+		{"GIT clone", "git", true},
+	}
+
+	for _, tc := range tests {
+		res := containsWord(tc.s, tc.word)
+		if res != tc.expect {
+			t.Errorf("containsWord(%q, %q) = %t; esperava %t", tc.s, tc.word, res, tc.expect)
+		}
+	}
+}
+

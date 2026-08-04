@@ -61,6 +61,9 @@ func main() {
 		case "rules":
 			cli.HandleRulesCommand(cfg, args[1:], t)
 			return
+		case "learn", "aprender":
+			cli.HandleLearnCommand(cfg, args[1:], t)
+			return
 		}
 	}
 
