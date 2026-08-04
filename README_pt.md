@@ -39,6 +39,7 @@ O **Shelloma** é uma aplicação CLI nativa e ultrarrápida desenvolvida em Go 
 - 📦 **Instalação Multiplataforma**: Executáveis compilados (`.exe`, binários nativos) e pacotes Linux (`.deb`, `.rpm`, Snap, AppImage, Flatpak). Inclui integração desktop Linux (gerando o atalho `.desktop` e registrando o ícone oficial do aplicativo em formato vetorial SVG).
 - ⛓️ **Execução Multi Etapa**: Executa sequências de comandos multi etapa passo a passo com confirmações e gera logs para cada comando.
 - 📝 **Completion Bash**: Scripts de completude para shell automáticos em pacotes Debian/Ubuntu.
+- 🧠 **Aprendizado de Comandos**: Ensine um comando CLI ao Shelloma localmente com `shelloma learn <cmd>` (alias `aprender`). O help aprendido é salvo na sua máquina e injetado automaticamente no prompt sempre que o comando for mencionado.
 
 ---
 
@@ -199,6 +200,8 @@ shelloma -l en "list all active docker containers"
 shelloma -l es "mostrar procesos que consumen mas cpu"
 ```
 
+Ao passar uma instrução diretamente, o Shelloma executa em **modo execução única**: sugere, executa e encerra — sem o prompt de continuação do loop. Execute `shelloma` sem argumentos para usar o app interativo completo.
+
 ### Menu de Opções da CLI
 
 Ao gerar o comando, o Shelloma exibirá o card e aguardará sua ação:
@@ -272,6 +275,18 @@ shelloma rules edit 1 "Sempre abrir imagens com feh"
 # Excluir uma regra salva pelo índice
 shelloma rules delete 1
 ```
+
+### 🧠 Aprendizado de Comandos Customizados
+
+O Shelloma pode aprender qualquer comando CLI disponível na sua máquina para que futuras solicitações que o envolvam sejam respondidas com as opções reais do comando:
+
+```bash
+# Aprender as opções de um comando localmente (alias: aprender)
+shelloma learn git
+shelloma aprender git
+```
+
+Os comandos aprendidos ficam salvos localmente em `~/.config/shelloma/learned/<comando>.json`. Quando você menciona um comando aprendido na sua solicitação, a referência de help é injetada automaticamente no prompt para que o modelo gere comandos precisos.
 
 ### 📋 Histórico de Execução (Logs)
 

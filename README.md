@@ -39,6 +39,7 @@
 - 📦 **Cross-Platform Distribution**: Binaries for Windows (`.exe`), macOS, and Linux (`.deb`, `.rpm`, Snap, AppImage, Flatpak). Includes native Linux desktop integration (generating a `.desktop` launcher and registering the official SVG icon).
 - ⛓️ **Multi-Step Command Execution**: Executes multi-step command sequences step-by-step with confirmation prompts and logs each step.
 - 📝 **Bash Completion**: Automatic shell completion scripts for Debian/Ubuntu packages.
+- 🧠 **Command Learning**: Teach Shelloma a CLI command locally with `shelloma learn <cmd>` (alias `aprender`). The learned help is stored on your machine and automatically injected into the prompt whenever that command is mentioned.
 
 ---
 
@@ -199,6 +200,8 @@ shelloma -l pt "listar todos os arquivos da pasta atual"
 shelloma -l es "mostrar procesos que consumen mas cpu"
 ```
 
+Passing an instruction directly runs Shelloma in **single-shot mode**: it suggests, executes, and exits — no continuous-loop prompt. Run `shelloma` with no arguments for the full interactive terminal app.
+
 ### Interactive CLI Menu
 
 When a command is generated, Shelloma displays the card and waits for your choice:
@@ -272,6 +275,18 @@ shelloma rules edit 1 "Always open images with feh"
 # Delete a saved rule by index
 shelloma rules delete 1
 ```
+
+### 🧠 Custom Command Learning
+
+Shelloma can learn any CLI command available on your machine so future requests involving it are answered with its real options:
+
+```bash
+# Learn a command's options locally (alias: aprender)
+shelloma learn git
+shelloma aprender git
+```
+
+Learned commands are stored locally in `~/.config/shelloma/learned/<command>.json`. When you mention a learned command in your request, its help reference is automatically injected into the prompt so the model generates accurate commands.
 
 ### 📋 Structured Logging
 
